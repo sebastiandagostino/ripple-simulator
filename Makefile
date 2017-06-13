@@ -7,9 +7,9 @@ LIBS       = -pthread
 DEBUGFLAGS = -DDEBUG -g
 CXXFLAGS   = -O0 -std=c++11 -Wall -Wno-sign-compare -Wno-char-subscripts \
              -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS)
-HEADERS    = Core.h
+HEADERS    = Event.h Link.h Message.h Network.h Node.h NodeState.h
 
-SRCS       = Sim.cpp Util.cpp
+SRCS       = Sim.cpp Event.cpp Link.cpp Message.cpp Network.cpp Node.cpp NodeState.cpp
 
 OBJS       = $(SRCS:%.cpp=%.o)
 
@@ -27,5 +27,3 @@ sim:	$(OBJS)
 
 clean:
 	-rm -f sim *.o
-
-include .dep
