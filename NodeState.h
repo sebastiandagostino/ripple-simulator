@@ -23,11 +23,7 @@ public:
 
 	int getTimeStamp() const;
 
-	void setTimeStamp(int timeStamp);
-
 	unsigned char getState() const;
-
-	void setState(unsigned char state);
 
 	void updateStateIfTimeStampIsHigher(const NodeState& nodeState);
 
