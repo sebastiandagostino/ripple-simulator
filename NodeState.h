@@ -6,15 +6,30 @@
  */
 class NodeState {
 
-public:
+private:
 
-	int node;
+	int nodeId;
 
-	int ts;
+	int timeStamp;
 
 	unsigned char state;
 
-	NodeState(int n, int t, unsigned char s);
+
+public:
+
+	NodeState(int nodeId, int timeStamp, unsigned char state);
+
+	int getNodeId() const;
+
+	int getTimeStamp() const;
+
+	void setTimeStamp(int timeStamp);
+
+	unsigned char getState() const;
+
+	void setState(unsigned char state);
+
+	void updateStateIfTimeStampIsHigher(const NodeState& nodeState);
 
 };
 

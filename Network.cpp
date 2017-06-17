@@ -4,7 +4,6 @@
 
 Network::Network() :
 		master_time(0) {
-	;
 }
 
 void Network::sendMessage(const Message& message, Link& link, int send_time) {

@@ -71,11 +71,11 @@ int main(void) {
 		if (i % 2) {
 			nodes[i]->knowledge[i] = 1;
 			nodes[i]->nts[i] = 1;
-			++nodes_positive;
+			nodes_positive++;
 		} else {
 			nodes[i]->knowledge[i] = -1;
 			nodes[i]->nts[i] = 1;
-			++nodes_negative;
+			nodes_negative++;
 		}
 
 		// Build our UNL
@@ -84,7 +84,7 @@ int main(void) {
 			int cn = r_node(gen);
 			if ((cn != i) && !nodes[i]->isOnUNL(cn)) {
 				nodes[i]->unl.push_back(cn);
-				--unl_count;
+				unl_count--;
 			}
 		}
 	}
@@ -96,11 +96,10 @@ int main(void) {
 		while (links > 0) {
 			int lt = r_node(gen);
 			if ((lt != i) && !nodes[i]->hasLinkTo(lt)) {
-				int ll = nodes[i]->e2c_latency + nodes[lt]->e2c_latency
-						+ r_c2c(gen);
+				int ll = nodes[i]->e2c_latency + nodes[lt]->e2c_latency + r_c2c(gen);
 				nodes[i]->links.push_back(Link(lt, ll));
 				nodes[lt]->links.push_back(Link(i, ll));
-				--links;
+				links--;
 			}
 		}
 	}
@@ -112,20 +111,20 @@ int main(void) {
 	for (int i = 0; i < NUM_NODES; ++i) {
 		for (Link& l : nodes[i]->links) {
 			Message m(i, l.to_node);
-			m.data.insert(
-					std::make_pair(i, NodeState(i, 1, nodes[i]->knowledge[i])));
+			m.data.insert(std::make_pair(i, NodeState(i, 1, nodes[i]->knowledge[i])));
 			network.sendMessage(m, l, 0);
 		}
 	}
-	std::cerr << "Created " << network.messages.size() << " events"
-			<< std::endl;
+	std::cerr << "Created " << network.messages.size() << " events" << std::endl;
 
 	// run simulation
 	do {
-		if (nodes_positive > (NUM_NODES * CONSENSUS_PERCENT / 100))
+		if (nodes_positive > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
 			break;
-		if (nodes_negative > (NUM_NODES * CONSENSUS_PERCENT / 100))
+		}
+		if (nodes_negative > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
 			break;
+		}
 
 		std::map<int, Event>::iterator ev = network.messages.begin();
 		if (ev == network.messages.end()) {
@@ -133,32 +132,36 @@ int main(void) {
 			return 0;
 		}
 
-		if ((ev->first / 100) > (network.master_time / 100))
-			std::cerr << "Time: " << ev->first << " ms  " << nodes_positive
-					<< "/" << nodes_negative << std::endl;
+		if ((ev->first / 100) > (network.master_time / 100)) {
+			std::cerr << "Time: " << ev->first << " ms  " << nodes_positive << "/" << nodes_negative << std::endl;
+		}
 		network.master_time = ev->first;
 
 		for (const Message& m : ev->second.messages) {
-			if (m.data.empty()) // message was never sent
+			if (m.data.empty()) {
+				// message was never sent
 				--nodes[m.from_node]->messages_sent;
-			else
+			} else {
 				nodes[m.to_node]->receiveMessage(m, network);
+			}
 		}
 
 		network.messages.erase(ev);
 	} while (1);
 
 	int mc = 0;
-	for (std::map<int, Event>::iterator it = network.messages.begin();
-			it != network.messages.end(); ++it)
+	std::map<int, Event>::iterator it;
+	for (it = network.messages.begin(); it != network.messages.end(); ++it) {
 		mc += it->second.messages.size();
+	}
 	std::cerr << "Consensus reached in " << network.master_time << " ms with "
 			<< mc << " messages on the wire" << std::endl;
 
 	// output results
 	long total_messages_sent = 0;
-	for (int i = 0; i < NUM_NODES; ++i)
+	for (int i = 0; i < NUM_NODES; i++) {
 		total_messages_sent += nodes[i]->messages_sent;
+	}
 	std::cerr << "The average node sent " << total_messages_sent / NUM_NODES
 			<< " messages" << std::endl;
 
