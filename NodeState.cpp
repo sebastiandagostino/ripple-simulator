@@ -25,7 +25,8 @@ void NodeState::setState(unsigned char state) {
 }
 
 void NodeState::updateStateIfTimeStampIsHigher(const NodeState& nodeState) {
-	if (nodeState.getTimeStamp() > this->getTimeStamp()) {
+	if (this->nodeId == nodeState.getNodeId()
+			&& nodeState.getTimeStamp() > this->getTimeStamp()) {
 		this->setTimeStamp(nodeState.getTimeStamp());
 		this->setState(nodeState.getState());
 	}
