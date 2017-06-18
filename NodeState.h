@@ -14,7 +14,6 @@ private:
 
 	unsigned char state;
 
-
 public:
 
 	NodeState(int nodeId, int timeStamp, unsigned char state);
