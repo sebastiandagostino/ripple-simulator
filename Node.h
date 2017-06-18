@@ -24,27 +24,47 @@
 
 class Node {
 
-public:
+private:
 
-    int n, e2c_latency;
+    int nodeId;
 
-    std::vector<int> unl;
+    int latency; // E2C - End to core latency, the latency from a node to a nearby node
+
+    std::vector<int> uniqueNodeList;
+
     std::vector<Link> links;
 
-    std::vector<int> nts; // node time stamps
-    std::vector<signed char> knowledge; // node states
+    std::vector<int> nodeTimeStamps;
 
-    int messages_sent, messages_received;
+    std::vector<signed char> nodeStates;
 
-    Node(int nn, int mm);
+    int messagesSent;
 
-    void processMessage(const Message& m);
+    int messagesReceived;
 
-    bool isOnUNL(int j);
+public:
 
-    bool hasLinkTo(int j);
+    Node(int nodeId, int mm, int latency);
 
-    void receiveMessage(const Message& m, Network& n);
+	int getLatency() const;
+
+	int getMessagesSent() const;
+
+	void decreaseMessagesSent();
+
+	std::vector<int>& getUniqueNodeList();
+
+    std::vector<Link>& getLinks();
+
+    std::vector<int>& getNodeTimeStamps();
+
+    std::vector<signed char>& getNodeStates();
+
+    bool isOnUNL(int nodeId) const;
+
+    bool hasLinkTo(int nodeId) const;
+
+    void receiveMessage(const Message& message, Network& network);
 
 };
 

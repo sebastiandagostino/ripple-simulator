@@ -56,17 +56,16 @@ int main(void) {
 	// create nodes
 	std::cerr << "Creating nodes" << std::endl;
 	for (int i = 0; i < NUM_NODES; i++) {
-		nodes[i] = new Node(i, NUM_NODES);
-		nodes[i]->e2c_latency = r_e2c(gen);
+		nodes[i] = new Node(i, NUM_NODES, r_e2c(gen));
 
 		// our own position starts as 50/50 split
 		if (i % 2) {
-			nodes[i]->knowledge[i] = 1;
-			nodes[i]->nts[i] = 1;
+			nodes[i]->getNodeStates()[i] = 1;
+			nodes[i]->getNodeTimeStamps()[i] = 1;
 			nodesPositive++;
 		} else {
-			nodes[i]->knowledge[i] = -1;
-			nodes[i]->nts[i] = 1;
+			nodes[i]->getNodeStates()[i] = -1;
+			nodes[i]->getNodeTimeStamps()[i] = 1;
 			nodesNegative++;
 		}
 
@@ -75,7 +74,7 @@ int main(void) {
 		while (unl_count > 0) {
 			int cn = r_node(gen);
 			if ((cn != i) && !nodes[i]->isOnUNL(cn)) {
-				nodes[i]->unl.push_back(cn);
+				nodes[i]->getUniqueNodeList().push_back(cn);
 				unl_count--;
 			}
 		}
@@ -88,9 +87,9 @@ int main(void) {
 		while (links > 0) {
 			int lt = r_node(gen);
 			if ((lt != i) && !nodes[i]->hasLinkTo(lt)) {
-				int ll = nodes[i]->e2c_latency + nodes[lt]->e2c_latency + r_c2c(gen);
-				nodes[i]->links.push_back(Link(lt, ll));
-				nodes[lt]->links.push_back(Link(i, ll));
+				int ll = nodes[i]->getLatency() + nodes[lt]->getLatency() + r_c2c(gen);
+				nodes[i]->getLinks().push_back(Link(lt, ll));
+				nodes[lt]->getLinks().push_back(Link(i, ll));
 				links--;
 			}
 		}
@@ -101,9 +100,9 @@ int main(void) {
 	// trigger all nodes to make initial broadcasts of their own positions
 	std::cerr << "Creating initial messages" << std::endl;
 	for (int i = 0; i < NUM_NODES; i++) {
-		for (Link& link : nodes[i]->links) {
+		for (Link& link : nodes[i]->getLinks()) {
 			Message message(i, link.getToNodeId());
-			message.insertData(i, nodes[i]->knowledge[i]);
+			message.insertData(i, nodes[i]->getNodeStates()[i]);
 			network.sendMessage(message, link, 0);
 		}
 	}
@@ -132,7 +131,7 @@ int main(void) {
 		for (const Message& message : event->second.getMessages()) {
 			if (message.hasEmptyData()) {
 				// message was never sent
-				--nodes[message.getFromNodeId()]->messages_sent;
+				nodes[message.getFromNodeId()]->decreaseMessagesSent();
 			} else {
 				nodes[message.getToNodeId()]->receiveMessage(message, network);
 			}
@@ -152,7 +151,7 @@ int main(void) {
 	// output results
 	long totalMessagesSent = 0;
 	for (int i = 0; i < NUM_NODES; i++) {
-		totalMessagesSent += nodes[i]->messages_sent;
+		totalMessagesSent += nodes[i]->getMessagesSent();
 	}
 	std::cerr << "The average node sent " << totalMessagesSent / NUM_NODES
 			<< " messages" << std::endl;

@@ -3,22 +3,50 @@
 extern int nodesPositive;
 extern int nodesNegative;
 
-Node::Node(int nn, int mm) :
-	n(nn), nts(mm, 0), knowledge(mm, 0), messages_sent(0), messages_received(0) {
+Node::Node(int nodeId, int mm, int latency) :
+	nodeId(nodeId), latency(latency), nodeTimeStamps(mm, 0), nodeStates(mm, 0), messagesSent(0), messagesReceived(0) {
 }
 
-bool Node::isOnUNL(int j) {
-	for (int v : unl) {
-		if (v == j) {
+int Node::getLatency() const {
+	return latency;
+}
+
+int Node::getMessagesSent() const {
+	return messagesSent;
+}
+
+void Node::decreaseMessagesSent() {
+	this->messagesSent--;
+}
+
+std::vector<int>& Node::getUniqueNodeList() {
+	return uniqueNodeList;
+}
+
+std::vector<Link>& Node::getLinks() {
+	return links;
+}
+
+std::vector<int>& Node::getNodeTimeStamps() {
+	return nodeTimeStamps;
+}
+
+std::vector<signed char>& Node::getNodeStates() {
+	return nodeStates;
+}
+
+bool Node::isOnUNL(int nodeId) const {
+	for (int v : this->uniqueNodeList) {
+		if (v == nodeId) {
 			return true;
 		}
 	}
 	return false;
 }
 
-bool Node::hasLinkTo(int j) {
+bool Node::hasLinkTo(int nodeId) const {
 	for (const Link& link : links) {
-		if (link.getToNodeId() == j) {
+		if (link.getToNodeId() == nodeId) {
 			return true;
 		}
 	}
@@ -26,7 +54,7 @@ bool Node::hasLinkTo(int j) {
 }
 
 void Node::receiveMessage(const Message& message, Network& network) {
-	messages_received++;
+	messagesReceived++;
 
 	// If we were going to send any of this data to that node, skip it
 	for (Link& link : links) {
@@ -40,15 +68,15 @@ void Node::receiveMessage(const Message& message, Network& network) {
 	// 1) Update our knowledge
 	std::map<int, NodeState> changes;
 
-	std::map<int, NodeState>::const_iterator change_it;
-	for (change_it = message.getData().begin(); change_it != message.getData().end(); change_it++) {
-		if ((change_it->first != n)
-				&& (knowledge[change_it->first] != change_it->second.getState())
-				&& (change_it->second.getTimeStamp() > nts[change_it->first])) {
+	std::map<int, NodeState>::const_iterator chgIt;
+	for (chgIt = message.getData().begin(); chgIt != message.getData().end(); chgIt++) {
+		if ((chgIt->first != nodeId)
+				&& (nodeStates[chgIt->first] != chgIt->second.getState())
+				&& (chgIt->second.getTimeStamp() > nodeTimeStamps[chgIt->first])) {
 			// This gives us new information about a node
-			knowledge[change_it->first] = change_it->second.getState();
-			nts[change_it->first] = change_it->second.getTimeStamp();
-			changes.insert(std::make_pair(change_it->first, change_it->second));
+			nodeStates[chgIt->first] = chgIt->second.getState();
+			nodeTimeStamps[chgIt->first] = chgIt->second.getTimeStamp();
+			changes.insert(std::make_pair(chgIt->first, chgIt->second));
 		}
 	}
 
@@ -59,18 +87,18 @@ void Node::receiveMessage(const Message& message, Network& network) {
 	// 2) Choose our position change, if any
 	int unlCount = 0;
 	int unlBalance = 0;
-	for (int node : unl) {
-		if (knowledge[node] == 1) {
+	for (int node : uniqueNodeList) {
+		if (nodeStates[node] == 1) {
 			unlCount++;
 			unlBalance++;
 		}
-		if (knowledge[node] == -1) {
+		if (nodeStates[node] == -1) {
 			unlCount++;
 			unlBalance--;
 		}
 	}
 
-	if (n < NUM_MALICIOUS_NODES)  {
+	if (nodeId < NUM_MALICIOUS_NODES)  {
 		// if we are a malicious node, be contrarian
 		unlBalance = -unlBalance;
 	}
@@ -80,19 +108,19 @@ void Node::receiveMessage(const Message& message, Network& network) {
 
 	bool positionChange = false;
 	if (unlCount >= UNL_THRESH) { // We have enough data to make decisions
-		if ((knowledge[n] == 1) && (unlBalance < (-SELF_WEIGHT))) {
+		if ((nodeStates[nodeId] == 1) && (unlBalance < (-SELF_WEIGHT))) {
 			// we switch to -
-			knowledge[n] = -1;
+			nodeStates[nodeId] = -1;
 			nodesPositive--;
 			nodesNegative++;
-			changes.insert(std::make_pair(n, NodeState(n, ++nts[n], -1)));
+			changes.insert(std::make_pair(nodeId, NodeState(nodeId, ++nodeTimeStamps[nodeId], -1)));
 			positionChange = true;
-		} else if ((knowledge[n] == -1) && (unlBalance > SELF_WEIGHT)) {
+		} else if ((nodeStates[nodeId] == -1) && (unlBalance > SELF_WEIGHT)) {
 			// we switch to +
-			knowledge[n] = 1;
+			nodeStates[nodeId] = 1;
 			nodesPositive++;
 			nodesNegative--;
-			changes.insert(std::make_pair(n, NodeState(n, ++nts[n], +1)));
+			changes.insert(std::make_pair(nodeId, NodeState(nodeId, ++nodeTimeStamps[nodeId], +1)));
 			positionChange = true;
 		}
 	}
@@ -112,8 +140,8 @@ void Node::receiveMessage(const Message& message, Network& network) {
 					if (link.getReceiveTime() > sendTime) // a packet is on the wire
 						sendTime += link.getTotalLatency() / PACKETS_ON_WIRE; // wait a bit extra to send
 				}
-				network.sendMessage(Message(n, link.getToNodeId(), changes), link, sendTime);
-				messages_sent++;
+				network.sendMessage(Message(nodeId, link.getToNodeId(), changes), link, sendTime);
+				messagesSent++;
 			}
 		}
 	}
