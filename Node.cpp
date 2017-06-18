@@ -1,7 +1,7 @@
 #include "Node.h"
 
-extern int nodes_positive;
-extern int nodes_negative;
+extern int nodesPositive;
+extern int nodesNegative;
 
 Node::Node(int nn, int mm) :
 	n(nn), nts(mm, 0), knowledge(mm, 0), messages_sent(0), messages_received(0) {
@@ -25,14 +25,14 @@ bool Node::hasLinkTo(int j) {
 	return false;
 }
 
-void Node::receiveMessage(const Message& m, Network& network) {
+void Node::receiveMessage(const Message& message, Network& network) {
 	messages_received++;
 
 	// If we were going to send any of this data to that node, skip it
 	for (Link& link : links) {
-		if ((link.getToNodeId() == m.from_node) && (link.getSendTime() >= network.master_time)) {
+		if ((link.getToNodeId() == message.getFromNodeId()) && (link.getSendTime() >= network.master_time)) {
 			// We can still update a waiting outbound message
-			link.getMessages()->subPositions(m.data);
+			link.getMessages()->subPositions(message.getData());
 			break;
 		}
 	}
@@ -41,7 +41,7 @@ void Node::receiveMessage(const Message& m, Network& network) {
 	std::map<int, NodeState> changes;
 
 	std::map<int, NodeState>::const_iterator change_it;
-	for (change_it = m.data.begin(); change_it != m.data.end(); change_it++) {
+	for (change_it = message.getData().begin(); change_it != message.getData().end(); change_it++) {
 		if ((change_it->first != n)
 				&& (knowledge[change_it->first] != change_it->second.getState())
 				&& (change_it->second.getTimeStamp() > nts[change_it->first])) {
@@ -82,15 +82,15 @@ void Node::receiveMessage(const Message& m, Network& network) {
 		if ((knowledge[n] == 1) && (unl_balance < (-SELF_WEIGHT))) {
 			// we switch to -
 			knowledge[n] = -1;
-			nodes_positive--;
-			nodes_negative++;
+			nodesPositive--;
+			nodesNegative++;
 			changes.insert(std::make_pair(n, NodeState(n, ++nts[n], -1)));
 			pos_change = true;
 		} else if ((knowledge[n] == -1) && (unl_balance > SELF_WEIGHT)) {
 			// we switch to +
 			knowledge[n] = 1;
-			nodes_positive++;
-			nodes_negative--;
+			nodesPositive++;
+			nodesNegative--;
 			changes.insert(std::make_pair(n, NodeState(n, ++nts[n], +1)));
 			pos_change = true;
 		}
@@ -98,7 +98,7 @@ void Node::receiveMessage(const Message& m, Network& network) {
 
 	// 3) Broadcast the message
 	for (Link& link : links) {
-		if (pos_change || (link.getToNodeId() != m.from_node)) {
+		if (pos_change || (link.getToNodeId() != message.getFromNodeId())) {
 			// can we update an unsent message?
 			if (link.getSendTime() > network.master_time)
 				link.getMessages()->addPositions(changes);

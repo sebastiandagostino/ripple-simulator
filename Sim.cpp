@@ -26,14 +26,6 @@
 #include "Node.h"
 #include "NodeState.h"
 
-/*
-#define LEDGER_CONVERGE          4
-#define LEDGER_FORCE_CONVERGE    7
-#define AV_MIN_CONSENSUS        50
-#define AV_AVG_CONSENSUS        60
-#define AV_MAX_CONSENSUS        70
-*/
-
 #define NUM_NODES             1000
 #define CONSENSUS_PERCENT       80
 
@@ -47,8 +39,8 @@
 
 #define NUM_OUTBOUND_LINKS      10
 
-int nodes_positive = 0;
-int nodes_negative = 0;
+int nodesPositive = 0;
+int nodesNegative = 0;
 
 int main(void) {
 
@@ -63,7 +55,7 @@ int main(void) {
 
 	// create nodes
 	std::cerr << "Creating nodes" << std::endl;
-	for (int i = 0; i < NUM_NODES; ++i) {
+	for (int i = 0; i < NUM_NODES; i++) {
 		nodes[i] = new Node(i, NUM_NODES);
 		nodes[i]->e2c_latency = r_e2c(gen);
 
@@ -71,11 +63,11 @@ int main(void) {
 		if (i % 2) {
 			nodes[i]->knowledge[i] = 1;
 			nodes[i]->nts[i] = 1;
-			nodes_positive++;
+			nodesPositive++;
 		} else {
 			nodes[i]->knowledge[i] = -1;
 			nodes[i]->nts[i] = 1;
-			nodes_negative++;
+			nodesNegative++;
 		}
 
 		// Build our UNL
@@ -91,7 +83,7 @@ int main(void) {
 
 	// create links
 	std::cerr << "Creating links" << std::endl;
-	for (int i = 0; i < NUM_NODES; ++i) {
+	for (int i = 0; i < NUM_NODES; i++) {
 		int links = NUM_OUTBOUND_LINKS;
 		while (links > 0) {
 			int lt = r_node(gen);
@@ -108,61 +100,61 @@ int main(void) {
 
 	// trigger all nodes to make initial broadcasts of their own positions
 	std::cerr << "Creating initial messages" << std::endl;
-	for (int i = 0; i < NUM_NODES; ++i) {
-		for (Link& l : nodes[i]->links) {
-			Message m(i, l.getToNodeId());
-			m.data.insert(std::make_pair(i, NodeState(i, 1, nodes[i]->knowledge[i])));
-			network.sendMessage(m, l, 0);
+	for (int i = 0; i < NUM_NODES; i++) {
+		for (Link& link : nodes[i]->links) {
+			Message message(i, link.getToNodeId());
+			message.insertData(i, nodes[i]->knowledge[i]);
+			network.sendMessage(message, link, 0);
 		}
 	}
 	std::cerr << "Created " << network.messages.size() << " events" << std::endl;
 
 	// run simulation
 	do {
-		if (nodes_positive > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
+		if (nodesPositive > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
 			break;
 		}
-		if (nodes_negative > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
+		if (nodesNegative > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
 			break;
 		}
 
-		std::map<int, Event>::iterator ev = network.messages.begin();
-		if (ev == network.messages.end()) {
+		std::map<int, Event>::iterator event = network.messages.begin();
+		if (event == network.messages.end()) {
 			std::cerr << "Fatal: Radio Silence" << std::endl;
 			return 0;
 		}
 
-		if ((ev->first / 100) > (network.master_time / 100)) {
-			std::cerr << "Time: " << ev->first << " ms  " << nodes_positive << "/" << nodes_negative << std::endl;
+		if ((event->first / 100) > (network.master_time / 100)) {
+			std::cerr << "Time: " << event->first << " ms  " << nodesPositive << "/" << nodesNegative << std::endl;
 		}
-		network.master_time = ev->first;
+		network.master_time = event->first;
 
-		for (const Message& m : ev->second.getMessages()) {
-			if (m.data.empty()) {
+		for (const Message& message : event->second.getMessages()) {
+			if (message.hasEmptyData()) {
 				// message was never sent
-				--nodes[m.from_node]->messages_sent;
+				--nodes[message.getFromNodeId()]->messages_sent;
 			} else {
-				nodes[m.to_node]->receiveMessage(m, network);
+				nodes[message.getToNodeId()]->receiveMessage(message, network);
 			}
 		}
 
-		network.messages.erase(ev);
+		network.messages.erase(event);
 	} while (1);
 
 	int mc = 0;
 	std::map<int, Event>::iterator it;
-	for (it = network.messages.begin(); it != network.messages.end(); ++it) {
+	for (it = network.messages.begin(); it != network.messages.end(); it++) {
 		mc += it->second.getMessages().size();
 	}
 	std::cerr << "Consensus reached in " << network.master_time << " ms with "
 			<< mc << " messages on the wire" << std::endl;
 
 	// output results
-	long total_messages_sent = 0;
+	long totalMessagesSent = 0;
 	for (int i = 0; i < NUM_NODES; i++) {
-		total_messages_sent += nodes[i]->messages_sent;
+		totalMessagesSent += nodes[i]->messages_sent;
 	}
-	std::cerr << "The average node sent " << total_messages_sent / NUM_NODES
+	std::cerr << "The average node sent " << totalMessagesSent / NUM_NODES
 			<< " messages" << std::endl;
 
 }

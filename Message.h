@@ -10,19 +10,33 @@
  */
 class Message {
 
-public:
+private:
 
-    int from_node, to_node;
+    int fromNodeId;
+
+    int toNodeId;
 
     std::map<int, NodeState> data;
 
-    Message(int from, int to);
+public:
 
-    Message(int from, int to, const std::map<int, NodeState>& d);
+    Message(int fromNodeId, int toNodeId);
 
-    void addPositions(const std::map<int, NodeState>&);
+    Message(int fromNodeId, int toNodeId, const std::map<int, NodeState>& data);
 
-    void subPositions(const std::map<int, NodeState>&);
+	int getFromNodeId() const;
+
+	int getToNodeId() const;
+
+	bool hasEmptyData() const;
+
+	void insertData(int nodeId, signed char status);
+
+	const std::map<int, NodeState>& getData() const;
+
+    void addPositions(const std::map<int, NodeState>& data);
+
+    void subPositions(const std::map<int, NodeState>& data);
 
 };
 

@@ -1,26 +1,45 @@
 #include "Message.h"
 
-Message::Message(int from, int to) :
-	from_node(from), to_node(to) {
+Message::Message(int fromNodeId, int toNodeId) :
+	fromNodeId(fromNodeId), toNodeId(toNodeId) {
 }
 
-Message::Message(int from, int to, const std::map<int, NodeState>& d) :
-	from_node(from), to_node(to), data(d) {
+Message::Message(int fromNodeId, int toNodeId, const std::map<int, NodeState>& data) :
+	fromNodeId(fromNodeId), toNodeId(toNodeId), data(data) {
+}
+
+int Message::getFromNodeId() const {
+	return fromNodeId;
+}
+
+int Message::getToNodeId() const {
+	return toNodeId;
+}
+
+bool Message::hasEmptyData() const {
+	return data.empty();
+}
+
+const std::map<int, NodeState>& Message::getData() const {
+	return data;
+}
+
+void Message::insertData(int nodeId, signed char status) {
+	data.insert(std::make_pair(nodeId, NodeState(nodeId, 1, status)));
 }
 
 void Message::addPositions(const std::map<int, NodeState>& update) {
 	// add this information to our message
-	std::map<int, NodeState>::const_iterator update_iterator;
-	for (update_iterator = update.begin(); update_iterator != update.end(); update_iterator++) {
-		if (update_iterator->first != to_node) {
+	std::map<int, NodeState>::const_iterator updateIt;
+	for (updateIt = update.begin(); updateIt != update.end(); updateIt++) {
+		if (updateIt->first != this->toNodeId) {
 			// don't tell a node about itself
-			std::map<int, NodeState>::iterator message_iterator = data.find(update_iterator->first);
-
-			if (message_iterator != data.end() && message_iterator->first) {
+			std::map<int, NodeState>::iterator msgIt = data.find(updateIt->first);
+			if (msgIt != data.end() && msgIt->first) {
 				// we already had data about this node going in this message
-				message_iterator->second.updateStateIfTimeStampIsHigher(update_iterator->second);
+				msgIt->second.updateStateIfTimeStampIsHigher(updateIt->second);
 			} else {
-				data.insert(std::make_pair(update_iterator->first, update_iterator->second));
+				data.insert(std::make_pair(updateIt->first, updateIt->second));
 			}
 		}
 	}
@@ -28,16 +47,13 @@ void Message::addPositions(const std::map<int, NodeState>& update) {
 
 void Message::subPositions(const std::map<int, NodeState>& received) {
 	// we received this information from this node, so no need to send it
-	for (std::map<int, NodeState>::const_iterator received_iterator =
-			received.begin(); received_iterator != received.end();
-			++received_iterator) {
-		if (received_iterator->first != to_node) {
-			std::map<int, NodeState>::iterator message_iterator = data.find(
-					received_iterator->first);
-			if ((message_iterator != data.end())
-					&& (received_iterator->second.getTimeStamp()
-							>= message_iterator->second.getTimeStamp())) {
-				data.erase(message_iterator); // The node doesn't need the data
+	std::map<int, NodeState>::const_iterator rcvIt;
+	for (rcvIt = received.begin(); rcvIt != received.end(); rcvIt++) {
+		if (rcvIt->first != this->toNodeId) {
+			std::map<int, NodeState>::iterator msgIt = this->data.find(rcvIt->first);
+			if ((msgIt != this->data.end())
+					&& (rcvIt->second.getTimeStamp() >= msgIt->second.getTimeStamp())) {
+				this->data.erase(msgIt); // The node doesn't need the data
 			}
 		}
 	}
