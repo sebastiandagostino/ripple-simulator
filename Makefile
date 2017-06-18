@@ -5,7 +5,7 @@
 DEFS       =
 LIBS       = -pthread
 DEBUGFLAGS = -DDEBUG -g
-CXXFLAGS   = -O0 -std=c++11 -Wall -Wno-sign-compare -Wno-char-subscripts \
+CXXFLAGS   = -O3 -std=c++11 -Wall -Wno-sign-compare -Wno-char-subscripts \
              -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS)
 HEADERS    = Event.h Link.h Message.h Network.h Node.h NodeState.h
 
