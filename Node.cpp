@@ -30,7 +30,7 @@ void Node::receiveMessage(const Message& message, Network& network) {
 
 	// If we were going to send any of this data to that node, skip it
 	for (Link& link : links) {
-		if ((link.getToNodeId() == message.getFromNodeId()) && (link.getSendTime() >= network.master_time)) {
+		if ((link.getToNodeId() == message.getFromNodeId()) && (link.getSendTime() >= network.getMasterTime())) {
 			// We can still update a waiting outbound message
 			link.getMessages()->subPositions(message.getData());
 			break;
@@ -57,61 +57,62 @@ void Node::receiveMessage(const Message& message, Network& network) {
 	}
 
 	// 2) Choose our position change, if any
-	int unl_count = 0, unl_balance = 0;
+	int unlCount = 0;
+	int unlBalance = 0;
 	for (int node : unl) {
 		if (knowledge[node] == 1) {
-			unl_count++;
-			unl_balance++;
+			unlCount++;
+			unlBalance++;
 		}
 		if (knowledge[node] == -1) {
-			unl_count++;
-			unl_balance--;
+			unlCount++;
+			unlBalance--;
 		}
 	}
 
 	if (n < NUM_MALICIOUS_NODES)  {
 		// if we are a malicious node, be contrarian
-		unl_balance = -unl_balance;
+		unlBalance = -unlBalance;
 	}
 
 	// add a bias in favor of 'no' as time passes (agree to disagree)
-	unl_balance -= network.master_time / 250;
+	unlBalance -= network.getMasterTime() / 250;
 
-	bool pos_change = false;
-	if (unl_count >= UNL_THRESH) { // We have enough data to make decisions
-		if ((knowledge[n] == 1) && (unl_balance < (-SELF_WEIGHT))) {
+	bool positionChange = false;
+	if (unlCount >= UNL_THRESH) { // We have enough data to make decisions
+		if ((knowledge[n] == 1) && (unlBalance < (-SELF_WEIGHT))) {
 			// we switch to -
 			knowledge[n] = -1;
 			nodesPositive--;
 			nodesNegative++;
 			changes.insert(std::make_pair(n, NodeState(n, ++nts[n], -1)));
-			pos_change = true;
-		} else if ((knowledge[n] == -1) && (unl_balance > SELF_WEIGHT)) {
+			positionChange = true;
+		} else if ((knowledge[n] == -1) && (unlBalance > SELF_WEIGHT)) {
 			// we switch to +
 			knowledge[n] = 1;
 			nodesPositive++;
 			nodesNegative--;
 			changes.insert(std::make_pair(n, NodeState(n, ++nts[n], +1)));
-			pos_change = true;
+			positionChange = true;
 		}
 	}
 
 	// 3) Broadcast the message
 	for (Link& link : links) {
-		if (pos_change || (link.getToNodeId() != message.getFromNodeId())) {
+		if (positionChange || (link.getToNodeId() != message.getFromNodeId())) {
+			int sendTime = network.getMasterTime();
 			// can we update an unsent message?
-			if (link.getSendTime() > network.master_time)
+			if (link.getSendTime() > sendTime) {
 				link.getMessages()->addPositions(changes);
-			else {
-				// No, we need a new mesage
-				int send_time = network.master_time;
-				if (!pos_change) {
-					// delay the messag a bit to permit coalescing and suppression
-					send_time += BASE_DELAY;
-					if (link.getReceiveTime() > send_time) // a packet is on the wire
-						send_time += link.getTotalLatency() / PACKETS_ON_WIRE; // wait a bit extra to send
+			} else {
+				// No, we need a new message
+				if (!positionChange) {
+					// delay the message a bit to permit coalescing and suppression
+					sendTime += BASE_DELAY;
+					if (link.getReceiveTime() > sendTime) // a packet is on the wire
+						sendTime += link.getTotalLatency() / PACKETS_ON_WIRE; // wait a bit extra to send
 				}
-				network.sendMessage(Message(n, link.getToNodeId(), changes), link, send_time);
+				network.sendMessage(Message(n, link.getToNodeId(), changes), link, sendTime);
 				messages_sent++;
 			}
 		}

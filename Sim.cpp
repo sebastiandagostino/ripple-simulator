@@ -107,7 +107,7 @@ int main(void) {
 			network.sendMessage(message, link, 0);
 		}
 	}
-	std::cerr << "Created " << network.messages.size() << " events" << std::endl;
+	std::cerr << "Created " << network.countMessages() << " events" << std::endl;
 
 	// run simulation
 	do {
@@ -118,16 +118,16 @@ int main(void) {
 			break;
 		}
 
-		std::map<int, Event>::iterator event = network.messages.begin();
-		if (event == network.messages.end()) {
+		std::map<int, Event>::iterator event = network.getMessages().begin();
+		if (event == network.getMessages().end()) {
 			std::cerr << "Fatal: Radio Silence" << std::endl;
 			return 0;
 		}
 
-		if ((event->first / 100) > (network.master_time / 100)) {
+		if ((event->first / 100) > (network.getMasterTime() / 100)) {
 			std::cerr << "Time: " << event->first << " ms  " << nodesPositive << "/" << nodesNegative << std::endl;
 		}
-		network.master_time = event->first;
+		network.setMasterTime(event->first);
 
 		for (const Message& message : event->second.getMessages()) {
 			if (message.hasEmptyData()) {
@@ -138,15 +138,15 @@ int main(void) {
 			}
 		}
 
-		network.messages.erase(event);
+		network.getMessages().erase(event);
 	} while (1);
 
 	int mc = 0;
 	std::map<int, Event>::iterator it;
-	for (it = network.messages.begin(); it != network.messages.end(); it++) {
+	for (it = network.getMessages().begin(); it != network.getMessages().end(); it++) {
 		mc += it->second.getMessages().size();
 	}
-	std::cerr << "Consensus reached in " << network.master_time << " ms with "
+	std::cerr << "Consensus reached in " << network.getMasterTime() << " ms with "
 			<< mc << " messages on the wire" << std::endl;
 
 	// output results

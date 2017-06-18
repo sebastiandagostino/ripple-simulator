@@ -9,15 +9,25 @@
 
 class Network {
 
-public:
+private:
 
-	int master_time;
+	int masterTime;
 
 	std::map<int, Event> messages;
 
+public:
+
 	Network();
 
-	void sendMessage(const Message& message, Link& link, int send_time);
+	int getMasterTime() const;
+
+	void setMasterTime(int masterTime);
+
+	void sendMessage(const Message& message, Link& link, int sendTime);
+
+	int countMessages() const;
+
+	std::map<int, Event>& getMessages();
 
 };
 
