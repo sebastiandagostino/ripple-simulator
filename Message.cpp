@@ -1,11 +1,11 @@
 #include "Message.h"
 
 Message::Message(int from, int to) :
-		from_node(from), to_node(to) {
+	from_node(from), to_node(to) {
 }
 
 Message::Message(int from, int to, const std::map<int, NodeState>& d) :
-		from_node(from), to_node(to), data(d) {
+	from_node(from), to_node(to), data(d) {
 }
 
 void Message::addPositions(const std::map<int, NodeState>& update) {
@@ -19,12 +19,6 @@ void Message::addPositions(const std::map<int, NodeState>& update) {
 			if (message_iterator != data.end() && message_iterator->first) {
 				// we already had data about this node going in this message
 				message_iterator->second.updateStateIfTimeStampIsHigher(update_iterator->second);
-				/*
-				if (update_iterator->second.getTimeStamp() > message_iterator->second.getTimeStamp()) {
-					message_iterator->second.setTimeStamp(update_iterator->second.getTimeStamp());
-					message_iterator->second.setState(update_iterator->second.getState());
-				}
-				*/
 			} else {
 				data.insert(std::make_pair(update_iterator->first, update_iterator->second));
 			}

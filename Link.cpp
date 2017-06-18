@@ -1,7 +1,33 @@
 #include "Link.h"
 
-Link::Link(int t, int tl) :
-		to_node(t), total_latency(tl), lm_send_time(0), lm_recv_time(0), lm(0) {
-	;
+Link::Link(int toNodeId, int totalLatency) :
+	toNodeId(toNodeId), totalLatency(totalLatency), sendTime(0), messages(0) {
 }
 
+int Link::getToNodeId() const {
+	return toNodeId;
+}
+
+int Link::getReceiveTime() const {
+	return sendTime + totalLatency;
+}
+
+int Link::getSendTime() const {
+	return sendTime;
+}
+
+void Link::setSendTime(int sendTime) {
+	this->sendTime = sendTime;
+}
+
+int Link::getTotalLatency() const {
+	return totalLatency;
+}
+
+Message* Link::getMessages() {
+	return messages;
+}
+
+void Link::setMessages(Message* messages) {
+	this->messages = messages;
+}

@@ -4,7 +4,7 @@ extern int nodes_positive;
 extern int nodes_negative;
 
 Node::Node(int nn, int mm) :
-		n(nn), nts(mm, 0), knowledge(mm, 0), messages_sent(0), messages_received(0) {
+	n(nn), nts(mm, 0), knowledge(mm, 0), messages_sent(0), messages_received(0) {
 }
 
 bool Node::isOnUNL(int j) {
@@ -17,8 +17,8 @@ bool Node::isOnUNL(int j) {
 }
 
 bool Node::hasLinkTo(int j) {
-	for (const Link& l : links) {
-		if (l.to_node == j) {
+	for (const Link& link : links) {
+		if (link.getToNodeId() == j) {
 			return true;
 		}
 	}
@@ -30,9 +30,9 @@ void Node::receiveMessage(const Message& m, Network& network) {
 
 	// If we were going to send any of this data to that node, skip it
 	for (Link& link : links) {
-		if ((link.to_node == m.from_node) && (link.lm_send_time >= network.master_time)) {
+		if ((link.getToNodeId() == m.from_node) && (link.getSendTime() >= network.master_time)) {
 			// We can still update a waiting outbound message
-			link.lm->subPositions(m.data);
+			link.getMessages()->subPositions(m.data);
 			break;
 		}
 	}
@@ -60,12 +60,12 @@ void Node::receiveMessage(const Message& m, Network& network) {
 	int unl_count = 0, unl_balance = 0;
 	for (int node : unl) {
 		if (knowledge[node] == 1) {
-			++unl_count;
-			++unl_balance;
+			unl_count++;
+			unl_balance++;
 		}
 		if (knowledge[node] == -1) {
-			++unl_count;
-			--unl_balance;
+			unl_count++;
+			unl_balance--;
 		}
 	}
 
@@ -98,20 +98,20 @@ void Node::receiveMessage(const Message& m, Network& network) {
 
 	// 3) Broadcast the message
 	for (Link& link : links) {
-		if (pos_change || (link.to_node != m.from_node)) {
+		if (pos_change || (link.getToNodeId() != m.from_node)) {
 			// can we update an unsent message?
-			if (link.lm_send_time > network.master_time)
-				link.lm->addPositions(changes);
+			if (link.getSendTime() > network.master_time)
+				link.getMessages()->addPositions(changes);
 			else {
 				// No, we need a new mesage
 				int send_time = network.master_time;
 				if (!pos_change) {
 					// delay the messag a bit to permit coalescing and suppression
 					send_time += BASE_DELAY;
-					if (link.lm_recv_time > send_time) // a packet is on the wire
-						send_time += link.total_latency / PACKETS_ON_WIRE; // wait a bit extra to send
+					if (link.getReceiveTime() > send_time) // a packet is on the wire
+						send_time += link.getTotalLatency() / PACKETS_ON_WIRE; // wait a bit extra to send
 				}
-				network.sendMessage(Message(n, link.to_node, changes), link, send_time);
+				network.sendMessage(Message(n, link.getToNodeId(), changes), link, send_time);
 				messages_sent++;
 			}
 		}

@@ -110,7 +110,7 @@ int main(void) {
 	std::cerr << "Creating initial messages" << std::endl;
 	for (int i = 0; i < NUM_NODES; ++i) {
 		for (Link& l : nodes[i]->links) {
-			Message m(i, l.to_node);
+			Message m(i, l.getToNodeId());
 			m.data.insert(std::make_pair(i, NodeState(i, 1, nodes[i]->knowledge[i])));
 			network.sendMessage(m, l, 0);
 		}

@@ -8,17 +8,33 @@
  */
 class Link {
 
+private:
+
+    int toNodeId;
+
+    int totalLatency;
+
+    int sendTime;
+
+    Message* messages;
+
 public:
 
-    int to_node;
+    Link(int toNodeId, int totalLatency);
 
-    int total_latency;
+	int getToNodeId() const;
 
-    int lm_send_time, lm_recv_time;
+	int getReceiveTime() const;
 
-    Message* lm;
+	int getSendTime() const;
 
-    Link(int t, int tl);
+	void setSendTime(int sendTime);
+
+	int getTotalLatency() const;
+
+	Message* getMessages();
+
+	void setMessages(Message* messages);
 
 };
 
