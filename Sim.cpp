@@ -137,7 +137,7 @@ int main(void) {
 		}
 		network.master_time = ev->first;
 
-		for (const Message& m : ev->second.messages) {
+		for (const Message& m : ev->second.getMessages()) {
 			if (m.data.empty()) {
 				// message was never sent
 				--nodes[m.from_node]->messages_sent;
@@ -152,7 +152,7 @@ int main(void) {
 	int mc = 0;
 	std::map<int, Event>::iterator it;
 	for (it = network.messages.begin(); it != network.messages.end(); ++it) {
-		mc += it->second.messages.size();
+		mc += it->second.getMessages().size();
 	}
 	std::cerr << "Consensus reached in " << network.master_time << " ms with "
 			<< mc << " messages on the wire" << std::endl;

@@ -5,3 +5,6 @@ Message* Event::addMessage(const Message& m) {
 	return &*messages.rbegin();
 }
 
+const std::list<Message>& Event::getMessages() const {
+	return messages;
+}

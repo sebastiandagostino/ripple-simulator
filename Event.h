@@ -10,11 +10,15 @@
  */
 class Event {
 
-public:
+private:
 
 	std::list<Message> messages;
 
+public:
+
 	Message* addMessage(const Message& m);
+
+	const std::list<Message>& getMessages() const;
 
 };
 
