@@ -1,3 +1,4 @@
+# ripple-simulator
 
 This simulates avalanche to consensus with a network of randomly-connected
 nodes that sparsely, randomly trust each other.
