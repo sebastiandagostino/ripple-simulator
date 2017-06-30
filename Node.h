@@ -66,6 +66,10 @@ public:
 
     void receiveMessage(const Message& message, Network& network);
 
+    std::string getNodeString();
+
+    std::string getUNLString();
+
 };
 
 #endif /* NODE_H_ */

@@ -80,6 +80,11 @@ int main(void) {
 		}
 	}
 
+	for (Node* node : nodes) {
+		std::cout << node->getNodeString() << std::endl;
+		std::cout << node->getUNLString() << std::endl;
+	}
+
 	// create links
 	std::cerr << "Creating links" << std::endl;
 	for (int i = 0; i < NUM_NODES; i++) {

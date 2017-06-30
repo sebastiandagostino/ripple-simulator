@@ -1,4 +1,13 @@
 #include "Node.h"
+#include <sstream>
+
+namespace patch {
+    template <typename T> std::string to_string(const T& n) {
+        std::ostringstream stm ;
+        stm << n ;
+        return stm.str() ;
+    }
+}
 
 extern int nodesPositive;
 extern int nodesNegative;
@@ -51,6 +60,23 @@ bool Node::hasLinkTo(int nodeId) const {
 		}
 	}
 	return false;
+}
+
+std::string Node::getNodeString() {
+	return std::string("Node: ( " + patch::to_string(nodeId) + " )");
+}
+
+std::string Node::getUNLString() {
+	std::string string = "UNL: ( ";
+	int size = uniqueNodeList.size();
+	for (int i = 0; i < size; i++) {
+		string += patch::to_string(uniqueNodeList[i]);
+		if (i != size - 1) {
+			string += ", ";
+		}
+	}
+	string += " )";
+	return string;
 }
 
 void Node::receiveMessage(const Message& message, Network& network) {
