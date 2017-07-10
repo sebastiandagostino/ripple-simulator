@@ -1,8 +1,11 @@
 #include <iostream>
+#include <fstream>
 #include <random>
 
 #include "src/Link.h"
 #include "src/Node.h"
+
+#define DEFAULT_FILE "network.txt"
 
 #define NUM_NODES             1000
 
@@ -16,7 +19,16 @@
 
 #define NUM_OUTBOUND_LINKS      10
 
-int main(void) {
+int main(int argc, char* argv[]) {
+
+	std::ofstream file;
+	std::string fileName = DEFAULT_FILE;
+
+	if (argc == 2) {
+		fileName = argv[1];
+	}
+
+	file.open(fileName.c_str());
 
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
@@ -28,7 +40,7 @@ int main(void) {
 	Node* nodes[NUM_NODES];
 
 	// create nodes
-	std::cerr << "Creating nodes" << std::endl;
+	std::cout << "Creating nodes" << std::endl;
 	for (int i = 0; i < NUM_NODES; i++) {
 		nodes[i] = new Node(i, NUM_NODES, r_e2c(gen));
 
@@ -55,7 +67,7 @@ int main(void) {
 	}
 
 	// create links
-	std::cerr << "Creating links" << std::endl;
+	std::cout << "Creating links" << std::endl;
 	for (int i = 0; i < NUM_NODES; i++) {
 		int links = NUM_OUTBOUND_LINKS;
 		while (links > 0) {
@@ -69,8 +81,10 @@ int main(void) {
 		}
 	}
 
+	// print to file
+	std::cout << "Writing generated network to file: " << fileName << std::endl;
 	for (Node* node : nodes) {
-		std::cout << node->toString() << std::endl;
+		file << node->toString() << std::endl;
 	}
 
 }
