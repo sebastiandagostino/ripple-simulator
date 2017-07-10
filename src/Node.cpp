@@ -9,11 +9,8 @@ namespace patch {
     }
 }
 
-extern int nodesPositive;
-extern int nodesNegative;
-
 Node::Node(int nodeId, int mm, int latency) :
-	nodeId(nodeId), latency(latency), nodeTimeStamps(mm, 0), nodeStates(mm, 0), messagesSent(0), messagesReceived(0) {
+	nodeId(nodeId), latency(latency), nodeTimeStamps(mm, 0), nodeStates(mm, 0), messagesSent(0), messagesReceived(0), vote(0) {
 }
 
 int Node::getLatency() const {
@@ -62,11 +59,21 @@ bool Node::hasLinkTo(int nodeId) const {
 	return false;
 }
 
+int Node::getVote() const {
+	return this->vote;
+}
+
+void Node::setVote(int vote) {
+	this->vote = vote;
+}
+
 std::string Node::toString() {
 	// Begin
 	std::string string = "[ ";
 	// NodeId
 	string += patch::to_string(nodeId) + "; ";
+	// Vote
+	string += patch::to_string(vote) + "; ";
 	// UNL
 	int size = uniqueNodeList.size();
 	for (int i = 0; i < size; i++) {
@@ -147,15 +154,13 @@ void Node::receiveMessage(const Message& message, Network& network) {
 		if ((nodeStates[nodeId] == 1) && (unlBalance < (-SELF_WEIGHT))) {
 			// we switch to -
 			nodeStates[nodeId] = -1;
-			nodesPositive--;
-			nodesNegative++;
+			vote = -1;
 			changes.insert(std::make_pair(nodeId, NodeState(nodeId, ++nodeTimeStamps[nodeId], -1)));
 			positionChange = true;
 		} else if ((nodeStates[nodeId] == -1) && (unlBalance > SELF_WEIGHT)) {
 			// we switch to +
 			nodeStates[nodeId] = 1;
-			nodesPositive++;
-			nodesNegative--;
+			vote = 1;
 			changes.insert(std::make_pair(nodeId, NodeState(nodeId, ++nodeTimeStamps[nodeId], +1)));
 			positionChange = true;
 		}

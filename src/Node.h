@@ -42,6 +42,8 @@ private:
 
     int messagesReceived;
 
+    int vote;
+
 public:
 
     Node(int nodeId, int mm, int latency);
@@ -64,9 +66,13 @@ public:
 
     bool hasLinkTo(int nodeId) const;
 
-    void receiveMessage(const Message& message, Network& network);
+	int getVote() const;
+
+	void setVote(int vote);
 
     std::string toString();
+
+    void receiveMessage(const Message& message, Network& network);
 
 };
 

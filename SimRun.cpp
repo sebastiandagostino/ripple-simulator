@@ -39,9 +39,6 @@
 
 #define NUM_OUTBOUND_LINKS      10
 
-int nodesPositive = 0;
-int nodesNegative = 0;
-
 int main(void) {
 
 	// This will produce the same results each time
@@ -62,11 +59,11 @@ int main(void) {
 		if (i % 2) {
 			nodes[i]->getNodeStates()[i] = 1;
 			nodes[i]->getNodeTimeStamps()[i] = 1;
-			nodesPositive++;
+			nodes[i]->setVote(1); // positive vote
 		} else {
 			nodes[i]->getNodeStates()[i] = -1;
 			nodes[i]->getNodeTimeStamps()[i] = 1;
-			nodesNegative++;
+			nodes[i]->setVote(-1); // negative vote
 		}
 
 		// build our UNL
@@ -110,6 +107,16 @@ int main(void) {
 
 	// run simulation
 	do {
+		// count nodes and check convergence
+		int nodesPositive = 0;
+		int nodesNegative = 0;
+		for (int i = 0; i < NUM_NODES; i++) {
+			if (nodes[i]->getVote() > 0) {
+				nodesPositive++;
+			} else if (nodes[i]->getVote() < 0) {
+				nodesNegative++;
+			}
+		}
 		if (nodesPositive > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
 			break;
 		}
