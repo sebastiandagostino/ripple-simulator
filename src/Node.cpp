@@ -5,7 +5,7 @@ namespace patch {
     template <typename T> std::string to_string(const T& n) {
         std::ostringstream stm ;
         stm << n ;
-        return stm.str() ;
+        return stm.str();
     }
 }
 
@@ -62,12 +62,12 @@ bool Node::hasLinkTo(int nodeId) const {
 	return false;
 }
 
-std::string Node::getNodeString() {
-	return std::string("Node: ( " + patch::to_string(nodeId) + " )");
-}
-
-std::string Node::getUNLString() {
-	std::string string = "UNL: ( ";
+std::string Node::toString() {
+	// Begin
+	std::string string = "[ ";
+	// NodeId
+	string += patch::to_string(nodeId) + "; ";
+	// UNL
 	int size = uniqueNodeList.size();
 	for (int i = 0; i < size; i++) {
 		string += patch::to_string(uniqueNodeList[i]);
@@ -75,7 +75,17 @@ std::string Node::getUNLString() {
 			string += ", ";
 		}
 	}
-	string += " )";
+	string += "; ";
+	// Links
+	size = links.size();
+	for (int i = 0; i < size; i++) {
+		string += patch::to_string(links[i].getToNodeId());
+		if (i != size - 1) {
+			string += ", ";
+		}
+	}
+	// End
+	string += " ]";
 	return string;
 }
 

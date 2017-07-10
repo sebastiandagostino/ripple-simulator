@@ -19,12 +19,12 @@
 #include <iostream>
 #include <random>
 
-#include "Event.h"
-#include "Link.h"
-#include "Message.h"
-#include "Network.h"
-#include "Node.h"
-#include "NodeState.h"
+#include "src/Event.h"
+#include "src/Link.h"
+#include "src/Message.h"
+#include "src/Network.h"
+#include "src/Node.h"
+#include "src/NodeState.h"
 
 #define NUM_NODES             1000
 #define CONSENSUS_PERCENT       80
@@ -69,7 +69,7 @@ int main(void) {
 			nodesNegative++;
 		}
 
-		// Build our UNL
+		// build our UNL
 		int unl_count = r_unl(gen);
 		while (unl_count > 0) {
 			int cn = r_node(gen);
@@ -78,11 +78,6 @@ int main(void) {
 				unl_count--;
 			}
 		}
-	}
-
-	for (Node* node : nodes) {
-		std::cout << node->getNodeString() << std::endl;
-		std::cout << node->getUNLString() << std::endl;
 	}
 
 	// create links

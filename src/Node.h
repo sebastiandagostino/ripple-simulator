@@ -66,9 +66,7 @@ public:
 
     void receiveMessage(const Message& message, Network& network);
 
-    std::string getNodeString();
-
-    std::string getUNLString();
+    std::string toString();
 
 };
 
