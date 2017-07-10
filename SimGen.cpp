@@ -1,15 +1,10 @@
 #include <iostream>
 #include <random>
 
-#include "src/Event.h"
 #include "src/Link.h"
-#include "src/Message.h"
-#include "src/Network.h"
 #include "src/Node.h"
-#include "src/NodeState.h"
 
 #define NUM_NODES             1000
-#define CONSENSUS_PERCENT       80
 
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
@@ -20,9 +15,6 @@
 #define MAX_C2C_LATENCY        200
 
 #define NUM_OUTBOUND_LINKS      10
-
-int nodesPositive = 0;
-int nodesNegative = 0;
 
 int main(void) {
 
@@ -44,11 +36,11 @@ int main(void) {
 		if (i % 2) {
 			nodes[i]->getNodeStates()[i] = 1;
 			nodes[i]->getNodeTimeStamps()[i] = 1;
-			nodesPositive++;
+			nodes[i]->setVote(1); // positive vote
 		} else {
 			nodes[i]->getNodeStates()[i] = -1;
 			nodes[i]->getNodeTimeStamps()[i] = 1;
-			nodesNegative++;
+			nodes[i]->setVote(-1); // negative vote
 		}
 
 		// build our UNL
