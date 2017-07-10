@@ -24,9 +24,22 @@ int main(int argc, char* argv[]) {
 	std::ofstream file;
 	std::string fileName = DEFAULT_FILE;
 
+	int numNodes = NUM_NODES;
+	int numOutboundLinks = NUM_OUTBOUND_LINKS;
+
 	if (argc == 2) {
 		fileName = argv[1];
 	}
+
+	std::cout << "Running with NUM_NODES = " << numNodes << std::endl;
+	std::cout << "Running with UNL_MIN = " << UNL_MIN << std::endl;
+	std::cout << "Running with UNL_MAX = " << UNL_MAX << std::endl;
+	std::cout << "Running with NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
+	std::cout << "Running with MIN_E2C_LATENCY = " << MIN_E2C_LATENCY << std::endl;
+	std::cout << "Running with MAX_E2C_LATENCY = " << MAX_E2C_LATENCY << std::endl;
+	std::cout << "Running with MIN_C2C_LATENCY = " << MIN_C2C_LATENCY << std::endl;
+	std::cout << "Running with MAX_C2C_LATENCY = " << MAX_C2C_LATENCY << std::endl;
+	std::cout << std::endl;
 
 	file.open(fileName.c_str());
 
@@ -35,14 +48,14 @@ int main(int argc, char* argv[]) {
 	std::uniform_int_distribution<> r_e2c(MIN_E2C_LATENCY, MAX_E2C_LATENCY);
 	std::uniform_int_distribution<> r_c2c(MIN_C2C_LATENCY, MAX_C2C_LATENCY);
 	std::uniform_int_distribution<> r_unl(UNL_MIN, UNL_MAX);
-	std::uniform_int_distribution<> r_node(0, NUM_NODES - 1);
+	std::uniform_int_distribution<> r_node(0, numNodes - 1);
 
-	Node* nodes[NUM_NODES];
+	Node* nodes[numNodes];
 
 	// create nodes
 	std::cout << "Creating nodes" << std::endl;
-	for (int i = 0; i < NUM_NODES; i++) {
-		nodes[i] = new Node(i, NUM_NODES, r_e2c(gen));
+	for (int i = 0; i < numNodes; i++) {
+		nodes[i] = new Node(i, numNodes, r_e2c(gen));
 
 		// our own position starts as 50/50 split
 		if (i % 2) {
@@ -68,8 +81,8 @@ int main(int argc, char* argv[]) {
 
 	// create links
 	std::cout << "Creating links" << std::endl;
-	for (int i = 0; i < NUM_NODES; i++) {
-		int links = NUM_OUTBOUND_LINKS;
+	for (int i = 0; i < numNodes; i++) {
+		int links = numOutboundLinks;
 		while (links > 0) {
 			int lt = r_node(gen);
 			if ((lt != i) && !nodes[i]->hasLinkTo(lt)) {
