@@ -35,18 +35,7 @@
 
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
-// C2C - Core to core, the additional latency when nodes are far 
-/*
-#define MIN_E2C_LATENCY          5
-#define MAX_E2C_LATENCY         50
-#define MIN_C2C_LATENCY          5
-#define MAX_C2C_LATENCY        200
-#define NUM_NODES             1000
-#define NUM_OUTBOUND_LINKS      10
-#define UNL_MIN                 20
-#define UNL_MAX                 30
-#define UNL_THRESH              (UNL_MIN/2) // unl datapoints we have to have before we change position
-*/
+// C2C - Core to core, the additional latency when nodes are far
 
 int main(int argc, char* argv[]) {
 
