@@ -17,6 +17,9 @@
  */
 //==============================================================================
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 #include <random>
 
 #include "src/Event.h"
@@ -26,34 +29,128 @@
 #include "src/Node.h"
 #include "src/NodeState.h"
 
-#define NUM_NODES             1000
 #define CONSENSUS_PERCENT       80
+
+#define DEFAULT_FILE "network.txt"
 
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
 // C2C - Core to core, the additional latency when nodes are far 
+/*
 #define MIN_E2C_LATENCY          5
 #define MAX_E2C_LATENCY         50
 #define MIN_C2C_LATENCY          5
 #define MAX_C2C_LATENCY        200
-
+#define NUM_NODES             1000
 #define NUM_OUTBOUND_LINKS      10
+#define UNL_MIN                 20
+#define UNL_MAX                 30
+#define UNL_THRESH              (UNL_MIN/2) // unl datapoints we have to have before we change position
+*/
 
-int main(void) {
+int main(int argc, char* argv[]) {
+
+	std::string fileName = DEFAULT_FILE;
+
+	if (argc == 2) {
+		fileName = argv[1];
+	}
+
+	std::ifstream file(fileName.c_str());
+
+	std::cout << "Loading network from file: " << fileName << std::endl;
+
+	std::stringstream ss;
+
+	std::string stringNumNodes;
+	getline(file, stringNumNodes);
+	int numNodes;
+	ss << stringNumNodes;
+	ss >> numNodes;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
+
+	std::string stringUnlMin;
+	getline(file, stringUnlMin);
+	int unlMin;
+	ss << stringUnlMin;
+	ss >> unlMin;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
+
+	std::string stringUnlMax;
+	getline(file, stringUnlMax);
+	int unlMax;
+	ss << stringUnlMax;
+	ss >> unlMax;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
+
+	std::string stringNumOutboundLinks;
+	getline(file, stringNumOutboundLinks);
+	int numOutboundLinks;
+	ss << stringNumOutboundLinks;
+	ss >> numOutboundLinks;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
+
+	std::string stringMinE2C;
+	getline(file, stringMinE2C);
+	int minE2C;
+	ss << stringMinE2C;
+	ss >> minE2C;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
+
+	std::string stringMaxE2C;
+	getline(file, stringMaxE2C);
+	int maxE2C;
+	ss << stringMaxE2C;
+	ss >> maxE2C;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
+
+	std::string stringMinC2C;
+	getline(file, stringMinC2C);
+	int minC2C;
+	ss << stringMinC2C;
+	ss >> minC2C;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
+
+	std::string stringMaxC2C;
+	getline(file, stringMaxC2C);
+	int maxC2C;
+	ss << stringMaxC2C;
+	ss >> maxC2C;
+	ss.str("");
+	ss.clear();
+	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
+
+	//return 0;
+
+	int unlThresh = unlMin / 2;
 
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
-	std::uniform_int_distribution<> r_e2c(MIN_E2C_LATENCY, MAX_E2C_LATENCY);
-	std::uniform_int_distribution<> r_c2c(MIN_C2C_LATENCY, MAX_C2C_LATENCY);
-	std::uniform_int_distribution<> r_unl(UNL_MIN, UNL_MAX);
-	std::uniform_int_distribution<> r_node(0, NUM_NODES - 1);
+	std::uniform_int_distribution<> r_e2c(minE2C, maxE2C);
+	std::uniform_int_distribution<> r_c2c(minC2C, maxC2C);
+	std::uniform_int_distribution<> r_unl(unlMin, unlMax);
+	std::uniform_int_distribution<> r_node(0, numNodes - 1);
 
-	Node* nodes[NUM_NODES];
+	Node* nodes[numNodes];
 
 	// create nodes
 	std::cerr << "Creating nodes" << std::endl;
-	for (int i = 0; i < NUM_NODES; i++) {
-		nodes[i] = new Node(i, NUM_NODES, r_e2c(gen));
+	for (int i = 0; i < numNodes; i++) {
+		nodes[i] = new Node(i, numNodes, r_e2c(gen));
 
 		// our own position starts as 50/50 split
 		if (i % 2) {
@@ -79,8 +176,8 @@ int main(void) {
 
 	// create links
 	std::cerr << "Creating links" << std::endl;
-	for (int i = 0; i < NUM_NODES; i++) {
-		int links = NUM_OUTBOUND_LINKS;
+	for (int i = 0; i < numNodes; i++) {
+		int links = numOutboundLinks;
 		while (links > 0) {
 			int lt = r_node(gen);
 			if ((lt != i) && !nodes[i]->hasLinkTo(lt)) {
@@ -96,7 +193,7 @@ int main(void) {
 
 	// trigger all nodes to make initial broadcasts of their own positions
 	std::cerr << "Creating initial messages" << std::endl;
-	for (int i = 0; i < NUM_NODES; i++) {
+	for (int i = 0; i < numNodes; i++) {
 		for (Link& link : nodes[i]->getLinks()) {
 			Message message(i, link.getToNodeId());
 			message.insertData(i, nodes[i]->getNodeStates()[i]);
@@ -110,17 +207,17 @@ int main(void) {
 		// count nodes and check convergence
 		int nodesPositive = 0;
 		int nodesNegative = 0;
-		for (int i = 0; i < NUM_NODES; i++) {
+		for (int i = 0; i < numNodes; i++) {
 			if (nodes[i]->getVote() > 0) {
 				nodesPositive++;
 			} else if (nodes[i]->getVote() < 0) {
 				nodesNegative++;
 			}
 		}
-		if (nodesPositive > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
+		if (nodesPositive > (numNodes * CONSENSUS_PERCENT / 100)) {
 			break;
 		}
-		if (nodesNegative > (NUM_NODES * CONSENSUS_PERCENT / 100)) {
+		if (nodesNegative > (numNodes * CONSENSUS_PERCENT / 100)) {
 			break;
 		}
 
@@ -140,7 +237,7 @@ int main(void) {
 				// message was never sent
 				nodes[message.getFromNodeId()]->decreaseMessagesSent();
 			} else {
-				nodes[message.getToNodeId()]->receiveMessage(message, network);
+				nodes[message.getToNodeId()]->receiveMessage(message, network, unlThresh);
 			}
 		}
 
@@ -157,10 +254,12 @@ int main(void) {
 
 	// output results
 	long totalMessagesSent = 0;
-	for (int i = 0; i < NUM_NODES; i++) {
+	for (int i = 0; i < numNodes; i++) {
 		totalMessagesSent += nodes[i]->getMessagesSent();
 	}
-	std::cerr << "The average node sent " << totalMessagesSent / NUM_NODES
+	std::cerr << "The average node sent " << totalMessagesSent / numNodes
 			<< " messages" << std::endl;
+
+	return 0;
 
 }

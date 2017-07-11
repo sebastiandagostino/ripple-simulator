@@ -96,7 +96,7 @@ std::string Node::toString() {
 	return string;
 }
 
-void Node::receiveMessage(const Message& message, Network& network) {
+void Node::receiveMessage(const Message& message, Network& network, int unlThresh) {
 	messagesReceived++;
 
 	// If we were going to send any of this data to that node, skip it
@@ -150,7 +150,7 @@ void Node::receiveMessage(const Message& message, Network& network) {
 	unlBalance -= network.getMasterTime() / 250;
 
 	bool positionChange = false;
-	if (unlCount >= UNL_THRESH) { // We have enough data to make decisions
+	if (unlCount >= unlThresh) { // We have enough data to make decisions
 		if ((nodeStates[nodeId] == 1) && (unlBalance < (-SELF_WEIGHT))) {
 			// we switch to -
 			nodeStates[nodeId] = -1;

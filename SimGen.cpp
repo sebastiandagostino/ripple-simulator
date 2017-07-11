@@ -9,6 +9,11 @@
 
 #define NUM_NODES             1000
 
+#define UNL_MIN                 20
+#define UNL_MAX                 30
+
+#define NUM_OUTBOUND_LINKS      10
+
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
 // C2C - Core to core, the additional latency when nodes are far
@@ -16,8 +21,6 @@
 #define MAX_E2C_LATENCY         50
 #define MIN_C2C_LATENCY          5
 #define MAX_C2C_LATENCY        200
-
-#define NUM_OUTBOUND_LINKS      10
 
 int main(int argc, char* argv[]) {
 
@@ -31,6 +34,12 @@ int main(int argc, char* argv[]) {
 		fileName = argv[1];
 	}
 
+	file.open(fileName.c_str());
+
+	if (!file.is_open()) {
+		return -1;
+	}
+
 	std::cout << "Running with NUM_NODES = " << numNodes << std::endl;
 	std::cout << "Running with UNL_MIN = " << UNL_MIN << std::endl;
 	std::cout << "Running with UNL_MAX = " << UNL_MAX << std::endl;
@@ -41,7 +50,14 @@ int main(int argc, char* argv[]) {
 	std::cout << "Running with MAX_C2C_LATENCY = " << MAX_C2C_LATENCY << std::endl;
 	std::cout << std::endl;
 
-	file.open(fileName.c_str());
+	file << numNodes << std::endl;
+	file << UNL_MIN << std::endl;
+	file << UNL_MAX << std::endl;
+	file << numOutboundLinks << std::endl;
+	file << MIN_E2C_LATENCY << std::endl;
+	file << MAX_E2C_LATENCY << std::endl;
+	file << MIN_C2C_LATENCY << std::endl;
+	file << MAX_C2C_LATENCY << std::endl;
 
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
@@ -99,5 +115,8 @@ int main(int argc, char* argv[]) {
 	for (Node* node : nodes) {
 		file << node->toString() << std::endl;
 	}
+	file.close();
+
+	return 0;
 
 }

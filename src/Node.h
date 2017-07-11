@@ -9,12 +9,6 @@
 
 #define NUM_MALICIOUS_NODES     15
 
-#define UNL_MIN                 20
-
-#define UNL_MAX                 30
-
-#define UNL_THRESH              (UNL_MIN/2) // unl datapoints we have to have before we change position
-
 #define BASE_DELAY               1 	// extra time we delay a message to coalesce/suppress
 
 #define SELF_WEIGHT              1 	// how many UNL votes you give yourself
@@ -72,7 +66,7 @@ public:
 
     std::string toString();
 
-    void receiveMessage(const Message& message, Network& network);
+    void receiveMessage(const Message& message, Network& network, int unlThresh);
 
 };
 
