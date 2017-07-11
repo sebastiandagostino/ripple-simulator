@@ -37,6 +37,8 @@
 // E2C - End to core, the latency from a node to a nearby node
 // C2C - Core to core, the additional latency when nodes are far
 
+int readIntegerLine(std::ifstream& file);
+
 int main(int argc, char* argv[]) {
 
 	std::string fileName = DEFAULT_FILE;
@@ -45,87 +47,36 @@ int main(int argc, char* argv[]) {
 		fileName = argv[1];
 	}
 
+	// read parameters from file
+
 	std::ifstream file(fileName.c_str());
 
 	std::cout << "Loading network from file: " << fileName << std::endl;
 
-	std::stringstream ss;
-
-	std::string stringNumNodes;
-	getline(file, stringNumNodes);
-	int numNodes;
-	ss << stringNumNodes;
-	ss >> numNodes;
-	ss.str("");
-	ss.clear();
+	int numNodes = readIntegerLine(file);
 	std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
 
-	std::string stringUnlMin;
-	getline(file, stringUnlMin);
-	int unlMin;
-	ss << stringUnlMin;
-	ss >> unlMin;
-	ss.str("");
-	ss.clear();
+	int unlMin = readIntegerLine(file);
+	int unlThresh = unlMin / 2;
 	std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
 
-	std::string stringUnlMax;
-	getline(file, stringUnlMax);
-	int unlMax;
-	ss << stringUnlMax;
-	ss >> unlMax;
-	ss.str("");
-	ss.clear();
+	int unlMax = readIntegerLine(file);
 	std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
 
-	std::string stringNumOutboundLinks;
-	getline(file, stringNumOutboundLinks);
-	int numOutboundLinks;
-	ss << stringNumOutboundLinks;
-	ss >> numOutboundLinks;
-	ss.str("");
-	ss.clear();
+	int numOutboundLinks = readIntegerLine(file);
 	std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
 
-	std::string stringMinE2C;
-	getline(file, stringMinE2C);
-	int minE2C;
-	ss << stringMinE2C;
-	ss >> minE2C;
-	ss.str("");
-	ss.clear();
+	int minE2C = readIntegerLine(file);
 	std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
 
-	std::string stringMaxE2C;
-	getline(file, stringMaxE2C);
-	int maxE2C;
-	ss << stringMaxE2C;
-	ss >> maxE2C;
-	ss.str("");
-	ss.clear();
+	int maxE2C = readIntegerLine(file);
 	std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
 
-	std::string stringMinC2C;
-	getline(file, stringMinC2C);
-	int minC2C;
-	ss << stringMinC2C;
-	ss >> minC2C;
-	ss.str("");
-	ss.clear();
+	int minC2C = readIntegerLine(file);
 	std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
 
-	std::string stringMaxC2C;
-	getline(file, stringMaxC2C);
-	int maxC2C;
-	ss << stringMaxC2C;
-	ss >> maxC2C;
-	ss.str("");
-	ss.clear();
+	int maxC2C = readIntegerLine(file);
 	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
-
-	//return 0;
-
-	int unlThresh = unlMin / 2;
 
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
@@ -241,14 +192,25 @@ int main(int argc, char* argv[]) {
 	std::cerr << "Consensus reached in " << network.getMasterTime() << " ms with "
 			<< mc << " messages on the wire" << std::endl;
 
-	// output results
-	long totalMessagesSent = 0;
+	// output result
+	long totalMsgsSent = 0;
 	for (int i = 0; i < numNodes; i++) {
-		totalMessagesSent += nodes[i]->getMessagesSent();
+		totalMsgsSent += nodes[i]->getMessagesSent();
 	}
-	std::cerr << "The average node sent " << totalMessagesSent / numNodes
-			<< " messages" << std::endl;
+	std::cerr << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
 
 	return 0;
 
+}
+
+int readIntegerLine(std::ifstream& file) {
+	std::stringstream ss;
+	std::string string;
+	getline(file, string);
+	int integer;
+	ss << string;
+	ss >> integer;
+	ss.str("");
+	ss.clear();
+	return integer;
 }
