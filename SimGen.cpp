@@ -5,6 +5,8 @@
 #include "src/Link.h"
 #include "src/Node.h"
 
+#include "lib/jsmn.h"
+
 #define DEFAULT_FILE "network.txt"
 
 #define NUM_NODES             1000

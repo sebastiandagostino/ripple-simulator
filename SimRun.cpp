@@ -29,6 +29,8 @@
 #include "src/Node.h"
 #include "src/NodeState.h"
 
+#include "lib/jsmn.h"
+
 #define CONSENSUS_PERCENT       80
 
 #define DEFAULT_FILE "network.txt"
