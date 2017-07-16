@@ -113,9 +113,14 @@ int main(int argc, char* argv[]) {
 	file << "\t" << "\"MIN_C2C_LATENCY\": " << MIN_C2C_LATENCY << "," << std::endl;
 	file << "\t" << "\"MAX_C2C_LATENCY\": " << MAX_C2C_LATENCY << "," << std::endl;
 	file << "\t" << "\"network\": [" << std::endl;
-	for (Node* node : nodes) {
-		file << "\t" << "\t" << node->toJsonString() << "," << std::endl;
+	for (int i = 0; i < numNodes; i++) {
+		file << "\t" << "\t" << nodes[i]->toJsonString();
+		if (i != numNodes - 1) {
+			file << ",";
+		}
+		file << std::endl;
 	}
+
 	file << "\t" << "]" << std::endl;
 	file << "}" << std::endl;
 	file.close();
