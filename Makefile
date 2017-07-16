@@ -21,7 +21,7 @@ sim: $(OBJECTS) SimRun.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 gen: $(OBJECTS) SimGen.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
 	-rm -f *.o

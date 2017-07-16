@@ -67,32 +67,37 @@ void Node::setVote(int vote) {
 	this->vote = vote;
 }
 
-std::string Node::toString() {
+std::string Node::toJsonString() const {
 	// Begin
-	std::string string = "[ ";
+	std::string string = "{ ";
 	// NodeId
-	string += patch::to_string(nodeId) + "; ";
+	string += "\"nodeId\": " + patch::to_string(nodeId) + ", ";
 	// Vote
-	string += patch::to_string(vote) + "; ";
+	string += "\"vote\": " + patch::to_string(vote) + ", ";
 	// UNL
 	int size = uniqueNodeList.size();
+	string += "\"uniqueNodeListSize\": " + patch::to_string(size) + ", ";
+	string += "\"uniqueNodeList\": [ ";
 	for (int i = 0; i < size; i++) {
 		string += patch::to_string(uniqueNodeList[i]);
 		if (i != size - 1) {
 			string += ", ";
 		}
 	}
-	string += "; ";
+	string += "], ";
 	// Links
 	size = links.size();
+	string += "\"linksSize\": " + patch::to_string(size) + ", ";
+	string += "\"links\": [ ";
 	for (int i = 0; i < size; i++) {
 		string += patch::to_string(links[i].getToNodeId());
 		if (i != size - 1) {
 			string += ", ";
 		}
 	}
+	string += "] ";
 	// End
-	string += " ]";
+	string += " }";
 	return string;
 }
 

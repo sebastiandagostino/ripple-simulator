@@ -14,5 +14,3 @@ gen
 .project
 .settings/
 
-# Ignore other files
-*.txt

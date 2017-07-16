@@ -33,7 +33,7 @@
 
 #define CONSENSUS_PERCENT       80
 
-#define DEFAULT_FILE "network.txt"
+#define DEFAULT_FILE "rippleNetworkSimulationSet.json"
 
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node

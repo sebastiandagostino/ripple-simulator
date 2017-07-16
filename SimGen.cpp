@@ -5,9 +5,7 @@
 #include "src/Link.h"
 #include "src/Node.h"
 
-#include "lib/jsmn.h"
-
-#define DEFAULT_FILE "network.txt"
+#define DEFAULT_FILE "rippleNetworkSimulationSet.json"
 
 #define NUM_NODES             1000
 
@@ -51,15 +49,6 @@ int main(int argc, char* argv[]) {
 	std::cout << "Running with MIN_C2C_LATENCY = " << MIN_C2C_LATENCY << std::endl;
 	std::cout << "Running with MAX_C2C_LATENCY = " << MAX_C2C_LATENCY << std::endl;
 	std::cout << std::endl;
-
-	file << numNodes << std::endl;
-	file << UNL_MIN << std::endl;
-	file << UNL_MAX << std::endl;
-	file << numOutboundLinks << std::endl;
-	file << MIN_E2C_LATENCY << std::endl;
-	file << MAX_E2C_LATENCY << std::endl;
-	file << MIN_C2C_LATENCY << std::endl;
-	file << MAX_C2C_LATENCY << std::endl;
 
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
@@ -112,11 +101,23 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	// print to file
+	// print to json formatted text file
 	std::cout << "Writing generated network to file: " << fileName << std::endl;
+	file << "{" << std:: endl;
+	file << "\t" << "\"numNodes\": " << numNodes << "," << std::endl;
+	file << "\t" << "\"unlMin\": " << UNL_MIN << "," << std::endl;
+	file << "\t" << "\"unlMax\": " << UNL_MAX << "," << std::endl;
+	file << "\t" << "\"numOutboundLinks\": " << numOutboundLinks << "," << std::endl;
+	file << "\t" << "\"MIN_E2C_LATENCY\": " << MIN_E2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"MAX_E2C_LATENCY\": " << MAX_E2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"MIN_C2C_LATENCY\": " << MIN_C2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"MAX_C2C_LATENCY\": " << MAX_C2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"network\": [" << std::endl;
 	for (Node* node : nodes) {
-		file << node->toString() << std::endl;
+		file << "\t" << "\t" << node->toJsonString() << std::endl;
 	}
+	file << "\t" << "]" << std::endl;
+	file << "}" << std::endl;
 	file.close();
 
 	return 0;

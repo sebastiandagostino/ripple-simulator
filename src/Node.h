@@ -64,7 +64,7 @@ public:
 
 	void setVote(int vote);
 
-    std::string toString();
+	std::string toJsonString() const;
 
     void receiveMessage(const Message& message, Network& network, int unlThresh);
 
