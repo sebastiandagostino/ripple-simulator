@@ -59,65 +59,71 @@ int main(int argc, char* argv[]) {
 	file >> j;
 
 	if (j.find("numNodes") == j.end()) {
-	  std::cerr << "Value " << "NUM_NODES" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "NUM_NODES" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int numNodes = j.find("numNodes").value().get<int>();
 	std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
 	
 	if (j.find("unlMin") == j.end()) {
-	  std::cerr << "Value " << "UNL_MIN" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "UNL_MIN" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int unlMin = j.find("unlMin").value().get<int>();
 	std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
 	int unlThresh = unlMin / 2;
 	
 	if (j.find("unlMax") == j.end()) {
-	  std::cerr << "Value " << "UNL_MAX" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "UNL_MAX" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int unlMax = j.find("unlMax").value().get<int>();
 	std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
 	
 	if (j.find("numOutboundLinks") == j.end()) {
-	  std::cerr << "Value " << "NUM_OUTBOUND_LINKS" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "NUM_OUTBOUND_LINKS" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int numOutboundLinks = j.find("numOutboundLinks").value().get<int>();
 	std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
 	
 	if (j.find("minLatencyE2C") == j.end()) {
-	  std::cerr << "Value " << "MIN_E2C_LATENCY" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "MIN_E2C_LATENCY" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int minE2C = j.find("minLatencyE2C").value().get<int>();
 	std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
 	
 	if (j.find("maxLatencyE2C") == j.end()) {
-	  std::cerr << "Value " << "MAX_E2C_LATENCY" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "MAX_E2C_LATENCY" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int maxE2C = j.find("maxLatencyE2C").value().get<int>();
 	std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
 	
 	if (j.find("minLatencyC2C") == j.end()) {
-	  std::cerr << "Value " << "MIN_C2C_LATENCY" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "MIN_C2C_LATENCY" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int minC2C = j.find("minLatencyC2C").value().get<int>();
 	std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
 	
 	if (j.find("maxLatencyC2C") == j.end()) {
-	  std::cerr << "Value " << "MAX_C2C_LATENCY" << " not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Value " << "MAX_C2C_LATENCY" << " not found. Exiting..." << std::endl;
+		return -1;
 	}
 	int maxC2C = j.find("maxLatencyC2C").value().get<int>();
 	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
 	
 	if (j.find("network") == j.end()) {
-	  std::cerr << "Network not found. Exiting..." << std::endl;
-	  return -1;
+		std::cerr << "Network not found. Exiting..." << std::endl;
+		return -1;
+	}
+	
+	json net(j.find("network").value());
+	
+	for (auto& element : net) {
+		std::cout << element << std::endl;
 	}
 	
 	// This will produce the same results each time
