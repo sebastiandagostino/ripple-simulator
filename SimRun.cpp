@@ -55,10 +55,8 @@ int main(int argc, char* argv[]) {
 	std::cout << "Loading network from file: " << fileName << std::endl;
 
 	std::ifstream file(fileName.c_str());
-
-	std::string jsonString = static_cast<std::stringstream const&>(std::stringstream() << file.rdbuf()).str();
-
-	auto j = json::parse(jsonString);
+	json j;
+	file >> j;
 
 	if (j.find("numNodes") == j.end()) {
 	  std::cerr << "Value " << "NUM_NODES" << " not found. Exiting..." << std::endl;
@@ -116,7 +114,12 @@ int main(int argc, char* argv[]) {
 	}
 	int maxC2C = j.find("maxLatencyC2C").value().get<int>();
 	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
-		
+	
+	if (j.find("network") == j.end()) {
+	  std::cerr << "Network not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
 	std::uniform_int_distribution<> r_e2c(minE2C, maxE2C);
