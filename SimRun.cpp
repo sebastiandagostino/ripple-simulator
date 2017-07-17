@@ -29,25 +29,18 @@
 #include "src/Node.h"
 #include "src/NodeState.h"
 
-// Jasmine - Minimalistic JSON parser in C
-// https://github.com/zserge/jsmn
-#include "lib/jsmn.h"
+// JSON for modern C++
+// https://github.com/nlohmann/json
+#include "lib/json.hpp"
+using nlohmann::json;
 
 #define CONSENSUS_PERCENT       80
 
 #define DEFAULT_FILE 			"network.json"
 
-#define JSMN_TOKENS 			100000
-
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
 // C2C - Core to core, the additional latency when nodes are far
-
-std::string readFile(std::ifstream& in);
-
-int readIntegerValue(std::string& jsonString, jsmntok_t* t, int i);
-
-int jsoneq(const char* json, jsmntok_t* tok, const char* s);
 
 int main(int argc, char* argv[]) {
 
@@ -63,65 +56,67 @@ int main(int argc, char* argv[]) {
 
 	std::ifstream file(fileName.c_str());
 
-	std::string jsonString = readFile(file);
+	std::string jsonString = static_cast<std::stringstream const&>(std::stringstream() << file.rdbuf()).str();
 
-	jsmn_parser p;
-	jsmn_init(&p);
-	jsmntok_t t[JSMN_TOKENS]; // We expect no more than JSMN_TOKENS tokens
+	auto j = json::parse(jsonString);
 
-	int r = jsmn_parse(&p, jsonString.c_str(), jsonString.size(), t, sizeof(t) / sizeof(t[0]));
-
-	if (r < 0) {
-		std::cout << "Failed to parse JSON: " << r << std::endl;
-		return 1;
-	} else if (r < 1 || t[0].type != JSMN_OBJECT) { // Assume the top-level element is an object
-		std::cout << "Object expected in JSON file" << std::endl;
-		return 1;
+	if (j.find("numNodes") == j.end()) {
+	  std::cerr << "Value " << "NUM_NODES" << " not found. Exiting..." << std::endl;
+	  return -1;
 	}
-
-	int numNodes = 0, unlMin = 0, unlThresh = 0, unlMax = 0, numOutboundLinks = 0;
-	int minE2C = 0, maxE2C = 0, minC2C = 0, maxC2C = 0;
-
-	// Loop over all keys of the root object
-	for (int i = 1; i < r; i++) {
-		if (jsoneq(jsonString.c_str(), &t[i], "numNodes") == 0) {
-			numNodes = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "unlMin") == 0) {
-			unlMin = readIntegerValue(jsonString, t, i);
-			unlThresh = unlMin / 2;
-			std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "unlMax") == 0) {
-			unlMax = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "numOutboundLinks") == 0) {
-			numOutboundLinks = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "minLatencyE2C") == 0) {
-			int minE2C = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "maxLatencyE2C") == 0) {
-			maxE2C = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "minLatencyC2C") == 0) {
-			minC2C = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
-			i++;
-		} else if (jsoneq(jsonString.c_str(), &t[i], "maxLatencyC2C") == 0) {
-			maxC2C = readIntegerValue(jsonString, t, i);
-			std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
-			i++;
-
-		}
-
+	int numNodes = j.find("numNodes").value().get<int>();
+	std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
+	
+	if (j.find("unlMin") == j.end()) {
+	  std::cerr << "Value " << "UNL_MIN" << " not found. Exiting..." << std::endl;
+	  return -1;
 	}
-
+	int unlMin = j.find("unlMin").value().get<int>();
+	std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
+	int unlThresh = unlMin / 2;
+	
+	if (j.find("unlMax") == j.end()) {
+	  std::cerr << "Value " << "UNL_MAX" << " not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	int unlMax = j.find("unlMax").value().get<int>();
+	std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
+	
+	if (j.find("numOutboundLinks") == j.end()) {
+	  std::cerr << "Value " << "NUM_OUTBOUND_LINKS" << " not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	int numOutboundLinks = j.find("numOutboundLinks").value().get<int>();
+	std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
+	
+	if (j.find("minLatencyE2C") == j.end()) {
+	  std::cerr << "Value " << "MIN_E2C_LATENCY" << " not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	int minE2C = j.find("minLatencyE2C").value().get<int>();
+	std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
+	
+	if (j.find("maxLatencyE2C") == j.end()) {
+	  std::cerr << "Value " << "MAX_E2C_LATENCY" << " not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	int maxE2C = j.find("maxLatencyE2C").value().get<int>();
+	std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
+	
+	if (j.find("minLatencyC2C") == j.end()) {
+	  std::cerr << "Value " << "MIN_C2C_LATENCY" << " not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	int minC2C = j.find("minLatencyC2C").value().get<int>();
+	std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
+	
+	if (j.find("maxLatencyC2C") == j.end()) {
+	  std::cerr << "Value " << "MAX_C2C_LATENCY" << " not found. Exiting..." << std::endl;
+	  return -1;
+	}
+	int maxC2C = j.find("maxLatencyC2C").value().get<int>();
+	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
+		
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
 	std::uniform_int_distribution<> r_e2c(minE2C, maxE2C);
@@ -245,26 +240,4 @@ int main(int argc, char* argv[]) {
 
 	return EXIT_SUCCESS;
 
-}
-
-std::string readFile(std::ifstream& in) {
-    return static_cast<std::stringstream const&>(std::stringstream() << in.rdbuf()).str();
-}
-
-int readIntegerValue(std::string& jsonString, jsmntok_t* t, int i) {
-	std::string read = jsonString.substr(t[i+1].start, t[i+1].end-t[i+1].start);
-	std::istringstream ss(read);
-	int integer;
-	ss >> integer;
-	ss.str("");
-	ss.clear();
-	return integer;
-}
-
-int jsoneq(const char* json, jsmntok_t* tok, const char* s) {
-	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
-			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
-		return 0;
-	}
-	return -1;
 }
