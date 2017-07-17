@@ -5,7 +5,7 @@
 #include "src/Link.h"
 #include "src/Node.h"
 
-#define DEFAULT_FILE "rippleNetworkSimulationSet.json"
+#define DEFAULT_FILE "network.json"
 
 #define NUM_NODES             1000
 
@@ -108,10 +108,10 @@ int main(int argc, char* argv[]) {
 	file << "\t" << "\"unlMin\": " << UNL_MIN << "," << std::endl;
 	file << "\t" << "\"unlMax\": " << UNL_MAX << "," << std::endl;
 	file << "\t" << "\"numOutboundLinks\": " << numOutboundLinks << "," << std::endl;
-	file << "\t" << "\"MIN_E2C_LATENCY\": " << MIN_E2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"MAX_E2C_LATENCY\": " << MAX_E2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"MIN_C2C_LATENCY\": " << MIN_C2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"MAX_C2C_LATENCY\": " << MAX_C2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"minLatencyE2C\": " << MIN_E2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"maxLatencyE2C\": " << MAX_E2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"minLatencyC2C\": " << MIN_C2C_LATENCY << "," << std::endl;
+	file << "\t" << "\"maxLatencyC2C\": " << MAX_C2C_LATENCY << "," << std::endl;
 	file << "\t" << "\"network\": [" << std::endl;
 	for (int i = 0; i < numNodes; i++) {
 		file << "\t" << "\t" << nodes[i]->toJsonString();

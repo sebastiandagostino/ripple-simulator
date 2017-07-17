@@ -18,8 +18,8 @@
 //==============================================================================
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <cstring>
 #include <random>
 
 #include "src/Event.h"
@@ -29,17 +29,25 @@
 #include "src/Node.h"
 #include "src/NodeState.h"
 
+// Jasmine - Minimalistic JSON parser in C
+// https://github.com/zserge/jsmn
 #include "lib/jsmn.h"
 
 #define CONSENSUS_PERCENT       80
 
-#define DEFAULT_FILE "rippleNetworkSimulationSet.json"
+#define DEFAULT_FILE 			"network.json"
+
+#define JSMN_TOKENS 			100000
 
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
 // C2C - Core to core, the additional latency when nodes are far
 
-int readIntegerLine(std::ifstream& file);
+std::string readFile(std::ifstream& in);
+
+int readIntegerValue(std::string& jsonString, jsmntok_t* t, int i);
+
+int jsoneq(const char* json, jsmntok_t* tok, const char* s);
 
 int main(int argc, char* argv[]) {
 
@@ -49,36 +57,70 @@ int main(int argc, char* argv[]) {
 		fileName = argv[1];
 	}
 
-	// read parameters from file
-
-	std::ifstream file(fileName.c_str());
+	// read parameters and network from json file
 
 	std::cout << "Loading network from file: " << fileName << std::endl;
 
-	int numNodes = readIntegerLine(file);
-	std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
+	std::ifstream file(fileName.c_str());
 
-	int unlMin = readIntegerLine(file);
-	int unlThresh = unlMin / 2;
-	std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
+	std::string jsonString = readFile(file);
 
-	int unlMax = readIntegerLine(file);
-	std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
+	jsmn_parser p;
+	jsmn_init(&p);
+	jsmntok_t t[JSMN_TOKENS]; // We expect no more than JSMN_TOKENS tokens
 
-	int numOutboundLinks = readIntegerLine(file);
-	std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
+	int r = jsmn_parse(&p, jsonString.c_str(), jsonString.size(), t, sizeof(t) / sizeof(t[0]));
 
-	int minE2C = readIntegerLine(file);
-	std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
+	if (r < 0) {
+		std::cout << "Failed to parse JSON: " << r << std::endl;
+		return 1;
+	} else if (r < 1 || t[0].type != JSMN_OBJECT) { // Assume the top-level element is an object
+		std::cout << "Object expected in JSON file" << std::endl;
+		return 1;
+	}
 
-	int maxE2C = readIntegerLine(file);
-	std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
+	int numNodes = 0, unlMin = 0, unlThresh = 0, unlMax = 0, numOutboundLinks = 0;
+	int minE2C = 0, maxE2C = 0, minC2C = 0, maxC2C = 0;
 
-	int minC2C = readIntegerLine(file);
-	std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
+	// Loop over all keys of the root object
+	for (int i = 1; i < r; i++) {
+		if (jsoneq(jsonString.c_str(), &t[i], "numNodes") == 0) {
+			numNodes = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "unlMin") == 0) {
+			unlMin = readIntegerValue(jsonString, t, i);
+			unlThresh = unlMin / 2;
+			std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "unlMax") == 0) {
+			unlMax = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "numOutboundLinks") == 0) {
+			numOutboundLinks = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "minLatencyE2C") == 0) {
+			int minE2C = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "maxLatencyE2C") == 0) {
+			maxE2C = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "minLatencyC2C") == 0) {
+			minC2C = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
+			i++;
+		} else if (jsoneq(jsonString.c_str(), &t[i], "maxLatencyC2C") == 0) {
+			maxC2C = readIntegerValue(jsonString, t, i);
+			std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
+			i++;
 
-	int maxC2C = readIntegerLine(file);
-	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
+		}
+
+	}
 
 	// This will produce the same results each time
 	std::mt19937 gen; // Standard mersenne_twister_engine
@@ -201,18 +243,28 @@ int main(int argc, char* argv[]) {
 	}
 	std::cerr << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
 
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 
-int readIntegerLine(std::ifstream& file) {
-	std::stringstream ss;
-	std::string string;
-	getline(file, string);
+std::string readFile(std::ifstream& in) {
+    return static_cast<std::stringstream const&>(std::stringstream() << in.rdbuf()).str();
+}
+
+int readIntegerValue(std::string& jsonString, jsmntok_t* t, int i) {
+	std::string read = jsonString.substr(t[i+1].start, t[i+1].end-t[i+1].start);
+	std::istringstream ss(read);
 	int integer;
-	ss << string;
 	ss >> integer;
 	ss.str("");
 	ss.clear();
 	return integer;
+}
+
+int jsoneq(const char* json, jsmntok_t* tok, const char* s) {
+	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
+			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+		return 0;
+	}
+	return -1;
 }

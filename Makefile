@@ -1,10 +1,10 @@
-DEFS       =
-LIBS       = lib/libjsmn.a
+DEFS       = 
+LIBS       =
 DEBUGFLAGS = -DDEBUG -g
 CXXFLAGS   = -O3 -std=c++11 -Wall -Wno-sign-compare -Wno-char-subscripts \
              -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS)
-HEADERS    = $(wildcard *.h)
-OBJECTS    = $(patsubst %.cpp, %.o, $(wildcard src/*.cpp))
+HEADERS    = $(wildcard *.h) $(wildcard lib/*.h)
+OBJECTS    = $(patsubst %.cpp, %.o, $(wildcard src/*.cpp)) $(wildcard lib/*.c)
 
 .PHONY: default all clean
 
