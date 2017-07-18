@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
 	Node* nodes[numNodes];
 
-	// create nodes
+	// Create nodes
 	std::cout << "Creating nodes" << std::endl;
 	for (int i = 0; i < numNodes; i++) {
 		nodes[i] = new Node(i, numNodes, r_e2c(gen));
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 			nodes[i]->setVote(-1); // negative vote
 		}
 
-		// build our UNL
+		// Build our UNL
 		int unl_count = r_unl(gen);
 		while (unl_count > 0) {
 			int cn = r_node(gen);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	// create links
+	// Create links
 	std::cout << "Creating links" << std::endl;
 	for (int i = 0; i < numNodes; i++) {
 		int links = numOutboundLinks;
@@ -101,18 +101,12 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	// print to json formatted text file
+	// Print to json formatted text file
 	std::cout << "Writing generated network to file: " << fileName << std::endl;
 	file << "{" << std:: endl;
 	file << "\t" << "\"numNodes\": " << numNodes << "," << std::endl;
-	file << "\t" << "\"unlMin\": " << UNL_MIN << "," << std::endl;
-	file << "\t" << "\"unlMax\": " << UNL_MAX << "," << std::endl;
-	file << "\t" << "\"numOutboundLinks\": " << numOutboundLinks << "," << std::endl;
-	file << "\t" << "\"minLatencyE2C\": " << MIN_E2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"maxLatencyE2C\": " << MAX_E2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"minLatencyC2C\": " << MIN_C2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"maxLatencyC2C\": " << MAX_C2C_LATENCY << "," << std::endl;
-	file << "\t" << "\"network\": [" << std::endl;
+	file << "\t" << "\"unlThresh\": " << UNL_MIN / 2 << "," << std::endl;
+	file << "\t" << "\"nodes\": [" << std::endl;
 	for (int i = 0; i < numNodes; i++) {
 		file << "\t" << "\t" << nodes[i]->toJsonString();
 		if (i != numNodes - 1) {
@@ -120,11 +114,26 @@ int main(int argc, char* argv[]) {
 		}
 		file << std::endl;
 	}
-
-	file << "\t" << "]" << std::endl;
+	file << "\t" << "]," << std::endl;
+	file << "\t" << "\"links\": [ ";
+	for (int i = 0; i < numNodes; i++) {
+		int linkSize = nodes[i]->getLinks().size();
+		for (int j = 0; j < linkSize; j++) {
+			file << "{ " << "\"from\": " << nodes[i]->getNodeId() << ", ";
+			file << "\"to\": " << nodes[i]->getLinks()[j].getToNodeId() << ", ";
+			file << "\"latency\": " << nodes[i]->getLinks()[j].getTotalLatency() << " }";
+			if (j != linkSize - 1) {
+				file << ", ";
+			}
+		}
+		if (i != numNodes - 1) {
+			file << ", ";
+		}
+	}
+	file << " ]" << std::endl;
 	file << "}" << std::endl;
 	file.close();
 
-	return 0;
+	return EXIT_SUCCESS;
 
 }

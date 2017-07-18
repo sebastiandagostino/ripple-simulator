@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 		fileName = argv[1];
 	}
 
-	// read parameters and network from json file
+	// Read parameters and network from json file
 
 	std::cout << "Loading network from file: " << fileName << std::endl;
 
@@ -59,127 +59,69 @@ int main(int argc, char* argv[]) {
 	file >> j;
 
 	if (j.find("numNodes") == j.end()) {
-		std::cerr << "Value " << "NUM_NODES" << " not found. Exiting..." << std::endl;
-		return -1;
+		std::cerr << "Value NUM_NODES not found. Exiting..." << std::endl;
+		return EXIT_FAILURE;
 	}
 	int numNodes = j.find("numNodes").value().get<int>();
 	std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
-	
-	if (j.find("unlMin") == j.end()) {
-		std::cerr << "Value " << "UNL_MIN" << " not found. Exiting..." << std::endl;
-		return -1;
+
+	if (j.find("unlThresh") == j.end()) {
+		std::cerr << "Value UNL_THRESH not found. Exiting..." << std::endl;
+		return EXIT_FAILURE;
 	}
-	int unlMin = j.find("unlMin").value().get<int>();
-	std::cout << "Reading UNL_MIN = " << unlMin << std::endl;
-	int unlThresh = unlMin / 2;
-	
-	if (j.find("unlMax") == j.end()) {
-		std::cerr << "Value " << "UNL_MAX" << " not found. Exiting..." << std::endl;
-		return -1;
+	int unlThresh = j.find("unlThresh").value().get<int>();
+	std::cout << "Reading UNL_THRESH = " << unlThresh << std::endl;
+
+	// Create nodes
+
+	if (j.find("nodes") == j.end()) {
+		std::cerr << "Nodes not found. Exiting..." << std::endl;
+		return EXIT_FAILURE;
 	}
-	int unlMax = j.find("unlMax").value().get<int>();
-	std::cout << "Reading UNL_MAX = " << unlMax << std::endl;
-	
-	if (j.find("numOutboundLinks") == j.end()) {
-		std::cerr << "Value " << "NUM_OUTBOUND_LINKS" << " not found. Exiting..." << std::endl;
-		return -1;
-	}
-	int numOutboundLinks = j.find("numOutboundLinks").value().get<int>();
-	std::cout << "Reading NUM_OUTBOUND_LINKS = " << numOutboundLinks << std::endl;
-	
-	if (j.find("minLatencyE2C") == j.end()) {
-		std::cerr << "Value " << "MIN_E2C_LATENCY" << " not found. Exiting..." << std::endl;
-		return -1;
-	}
-	int minE2C = j.find("minLatencyE2C").value().get<int>();
-	std::cout << "Reading MIN_E2C_LATENCY = " << minE2C << std::endl;
-	
-	if (j.find("maxLatencyE2C") == j.end()) {
-		std::cerr << "Value " << "MAX_E2C_LATENCY" << " not found. Exiting..." << std::endl;
-		return -1;
-	}
-	int maxE2C = j.find("maxLatencyE2C").value().get<int>();
-	std::cout << "Reading MAX_E2C_LATENCY = " << maxE2C << std::endl;
-	
-	if (j.find("minLatencyC2C") == j.end()) {
-		std::cerr << "Value " << "MIN_C2C_LATENCY" << " not found. Exiting..." << std::endl;
-		return -1;
-	}
-	int minC2C = j.find("minLatencyC2C").value().get<int>();
-	std::cout << "Reading MIN_C2C_LATENCY = " << minC2C << std::endl;
-	
-	if (j.find("maxLatencyC2C") == j.end()) {
-		std::cerr << "Value " << "MAX_C2C_LATENCY" << " not found. Exiting..." << std::endl;
-		return -1;
-	}
-	int maxC2C = j.find("maxLatencyC2C").value().get<int>();
-	std::cout << "Reading MAX_C2C_LATENCY = " << maxC2C << std::endl;
-	
-	if (j.find("network") == j.end()) {
-		std::cerr << "Network not found. Exiting..." << std::endl;
-		return -1;
-	}
-	
-	json net(j.find("network").value());
-	
-	for (auto& element : net) {
-		std::cout << element << std::endl;
-	}
-	
-	// This will produce the same results each time
-	std::mt19937 gen; // Standard mersenne_twister_engine
-	std::uniform_int_distribution<> r_e2c(minE2C, maxE2C);
-	std::uniform_int_distribution<> r_c2c(minC2C, maxC2C);
-	std::uniform_int_distribution<> r_unl(unlMin, unlMax);
-	std::uniform_int_distribution<> r_node(0, numNodes - 1);
+	std::cout << "Creating nodes" << std::endl;
 
 	Node* nodes[numNodes];
 
-	// create nodes
-	std::cerr << "Creating nodes" << std::endl;
-	for (int i = 0; i < numNodes; i++) {
-		nodes[i] = new Node(i, numNodes, r_e2c(gen));
+	json net(j.find("nodes").value());
 
-		// our own position starts as 50/50 split
-		if (i % 2) {
-			nodes[i]->getNodeStates()[i] = 1;
-			nodes[i]->getNodeTimeStamps()[i] = 1;
-			nodes[i]->setVote(1); // positive vote
-		} else {
-			nodes[i]->getNodeStates()[i] = -1;
-			nodes[i]->getNodeTimeStamps()[i] = 1;
-			nodes[i]->setVote(-1); // negative vote
-		}
-
-		// build our UNL
-		int unl_count = r_unl(gen);
-		while (unl_count > 0) {
-			int cn = r_node(gen);
-			if ((cn != i) && !nodes[i]->isOnUNL(cn)) {
-				nodes[i]->getUniqueNodeList().push_back(cn);
-				unl_count--;
-			}
+	for (auto& element : net) {
+		int i = element["nodeId"];
+		int vote = element["vote"];
+		int latency = element["latency"];
+		nodes[i] = new Node(i, numNodes, latency);
+		nodes[i]->getNodeStates()[i] = vote;
+		nodes[i]->getNodeTimeStamps()[i] = 1;
+		nodes[i]->setVote(vote);
+		// Build our UNL
+		json uniqueNodeList(element.find("uniqueNodeList").value());
+		for (auto& unlNode : uniqueNodeList) {
+			nodes[i]->getUniqueNodeList().push_back(unlNode);
 		}
 	}
 
-	// create links
-	std::cerr << "Creating links" << std::endl;
-	for (int i = 0; i < numNodes; i++) {
-		int links = numOutboundLinks;
-		while (links > 0) {
-			int lt = r_node(gen);
-			if ((lt != i) && !nodes[i]->hasLinkTo(lt)) {
-				int ll = nodes[i]->getLatency() + nodes[lt]->getLatency() + r_c2c(gen);
-				nodes[i]->getLinks().push_back(Link(lt, ll));
-				nodes[lt]->getLinks().push_back(Link(i, ll));
-				links--;
-			}
-		}
+	// Create links
+
+	if (j.find("links") == j.end()) {
+		std::cerr << "Links not found. Exiting..." << std::endl;
+		return EXIT_FAILURE;
 	}
+	std::cout << "Creating links" << std::endl;
+
+	json links(j.find("links").value());
+
+	for (auto& link : links) {
+		int i = link["from"];
+		int lt = link["to"];
+		int latency = link["latency"];
+		int ll = nodes[i]->getLatency() + nodes[lt]->getLatency() + latency;
+		nodes[i]->getLinks().push_back(Link(lt, ll));
+		nodes[lt]->getLinks().push_back(Link(i, ll));
+	}
+
+	// Trigger all nodes to make initial broadcasts of their own positions
 
 	Network network;
 
-	// trigger all nodes to make initial broadcasts of their own positions
 	std::cerr << "Creating initial messages" << std::endl;
 	for (int i = 0; i < numNodes; i++) {
 		for (Link& link : nodes[i]->getLinks()) {
@@ -188,11 +130,12 @@ int main(int argc, char* argv[]) {
 			network.sendMessage(message, link, 0);
 		}
 	}
-	std::cerr << "Created " << network.countMessages() << " events" << std::endl;
+	std::cout << "Created " << network.countMessages() << " events" << std::endl;
 
-	// run simulation
+	// Run simulation
+
 	do {
-		// count nodes and check convergence
+		// Count nodes and check convergence
 		int nodesPositive = 0;
 		int nodesNegative = 0;
 		for (int i = 0; i < numNodes; i++) {
@@ -211,18 +154,19 @@ int main(int argc, char* argv[]) {
 
 		std::map<int, Event>::iterator event = network.getMessages().begin();
 		if (event == network.getMessages().end()) {
-			std::cerr << "Fatal: Radio Silence" << std::endl;
-			return 0;
+			std::cerr << "Fatal: Radio Silence. Exiting..." << std::endl;
+			return EXIT_FAILURE;
 		}
 
 		if ((event->first / 100) > (network.getMasterTime() / 100)) {
-			std::cerr << "Time: " << event->first << " ms  " << nodesPositive << "/" << nodesNegative << std::endl;
+			std::cout << "Time: " << event->first << " ms  " << nodesPositive
+					<< "/" << nodesNegative << std::endl;
 		}
 		network.setMasterTime(event->first);
 
 		for (const Message& message : event->second.getMessages()) {
 			if (message.hasEmptyData()) {
-				// message was never sent
+				// Message was never sent
 				nodes[message.getFromNodeId()]->decreaseMessagesSent();
 			} else {
 				nodes[message.getToNodeId()]->receiveMessage(message, network, unlThresh);
@@ -237,15 +181,15 @@ int main(int argc, char* argv[]) {
 	for (it = network.getMessages().begin(); it != network.getMessages().end(); it++) {
 		mc += it->second.getMessages().size();
 	}
-	std::cerr << "Consensus reached in " << network.getMasterTime() << " ms with "
-			<< mc << " messages on the wire" << std::endl;
+	std::cout << "Consensus reached in " << network.getMasterTime()
+			<< " ms with " << mc << " messages on the wire" << std::endl;
 
-	// output result
+	// Output result
 	long totalMsgsSent = 0;
 	for (int i = 0; i < numNodes; i++) {
 		totalMsgsSent += nodes[i]->getMessagesSent();
 	}
-	std::cerr << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
+	std::cout << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
 
 	return EXIT_SUCCESS;
 

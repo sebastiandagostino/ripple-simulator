@@ -9,8 +9,12 @@ namespace patch {
     }
 }
 
-Node::Node(int nodeId, int mm, int latency) :
-	nodeId(nodeId), latency(latency), nodeTimeStamps(mm, 0), nodeStates(mm, 0), messagesSent(0), messagesReceived(0), vote(0) {
+Node::Node(int nodeId, int numNodes, int latency) :
+	nodeId(nodeId), latency(latency), nodeTimeStamps(numNodes, 0), nodeStates(numNodes, 0), messagesSent(0), messagesReceived(0), vote(0) {
+}
+
+int Node::getNodeId() const {
+	return nodeId;
 }
 
 int Node::getLatency() const {
@@ -74,23 +78,13 @@ std::string Node::toJsonString() const {
 	string += "\"nodeId\": " + patch::to_string(nodeId) + ", ";
 	// Vote
 	string += "\"vote\": " + patch::to_string(vote) + ", ";
+	// Latency
+	string += "\"latency\": " + patch::to_string(latency) + ", ";
 	// UNL
 	int size = uniqueNodeList.size();
-	string += "\"uniqueNodeListSize\": " + patch::to_string(size) + ", ";
 	string += "\"uniqueNodeList\": [ ";
 	for (int i = 0; i < size; i++) {
 		string += patch::to_string(uniqueNodeList[i]);
-		if (i != size - 1) {
-			string += ", ";
-		}
-	}
-	string += "], ";
-	// Links
-	size = links.size();
-	string += "\"linksSize\": " + patch::to_string(size) + ", ";
-	string += "\"links\": [ ";
-	for (int i = 0; i < size; i++) {
-		string += patch::to_string(links[i].getToNodeId());
 		if (i != size - 1) {
 			string += ", ";
 		}

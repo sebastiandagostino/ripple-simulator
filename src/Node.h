@@ -40,7 +40,9 @@ private:
 
 public:
 
-    Node(int nodeId, int mm, int latency);
+    Node(int nodeId, int numNodes, int latency);
+
+    int getNodeId() const;
 
 	int getLatency() const;
 
