@@ -1,0 +1,149 @@
+{
+	"numNodes": 11,
+	"unlThresh": 2,
+	"nodes": [{
+		"nodeId": 0,
+		"vote": 1,
+		"latency": 401,
+		"uniqueNodeList": [4, 1, 3, 5, 2]
+	}, {
+		"nodeId": 1,
+		"vote": 1,
+		"latency": 74,
+		"uniqueNodeList": [4, 0, 3, 5, 2]
+	}, {
+		"nodeId": 2,
+		"vote": 1,
+		"latency": 177,
+		"uniqueNodeList": [4, 0, 1, 3, 5]
+	}, {
+		"nodeId": 3,
+		"vote": 1,
+		"latency": 179,
+		"uniqueNodeList": [4, 0, 1, 8, 5, 2]
+	}, {
+		"nodeId": 4,
+		"vote": 1,
+		"latency": 152,
+		"uniqueNodeList": [0, 7, 1, 3, 5, 2]
+	}, {
+		"nodeId": 5,
+		"vote": 1,
+		"latency": 16,
+		"uniqueNodeList": [4, 0, 1, 3, 2]
+	}, {
+		"nodeId": 6,
+		"vote": -1,
+		"latency": 156,
+		"uniqueNodeList": [10, 7, 8, 9]
+	}, {
+		"nodeId": 7,
+		"vote": -1,
+		"latency": 485,
+		"uniqueNodeList": [4, 10, 8, 6, 9]
+	}, {
+		"nodeId": 8,
+		"vote": -1,
+		"latency": 221,
+		"uniqueNodeList": [10, 7, 3, 6, 9]
+	}, {
+		"nodeId": 9,
+		"vote": -1,
+		"latency": 458,
+		"uniqueNodeList": [10, 7, 8, 6]
+	}, {
+		"nodeId": 10,
+		"vote": -1,
+		"latency": 447,
+		"uniqueNodeList": [7, 8, 6, 9]
+	}],
+	"links": [{
+		"from": 0,
+		"to": 1,
+		"latency": 228
+	}, {
+		"from": 0,
+		"to": 8,
+		"latency": 125
+	}, {
+		"from": 1,
+		"to": 9,
+		"latency": 110
+	}, {
+		"from": 1,
+		"to": 8,
+		"latency": 283
+	}, {
+		"from": 2,
+		"to": 10,
+		"latency": 391
+	}, {
+		"from": 2,
+		"to": 9,
+		"latency": 166
+	}, {
+		"from": 3,
+		"to": 0,
+		"latency": 301
+	}, {
+		"from": 3,
+		"to": 1,
+		"latency": 126
+	}, {
+		"from": 4,
+		"to": 6,
+		"latency": 148
+	}, {
+		"from": 4,
+		"to": 5,
+		"latency": 405
+	}, {
+		"from": 5,
+		"to": 6,
+		"latency": 135
+	}, {
+		"from": 5,
+		"to": 7,
+		"latency": 327
+	}, {
+		"from": 6,
+		"to": 7,
+		"latency": 65
+	}, {
+		"from": 6,
+		"to": 8,
+		"latency": 463
+	}, {
+		"from": 7,
+		"to": 9,
+		"latency": 219
+	}, {
+		"from": 7,
+		"to": 8,
+		"latency": 311
+	}, {
+		"from": 8,
+		"to": 10,
+		"latency": 22
+	}, {
+		"from": 8,
+		"to": 9,
+		"latency": 399
+	}, {
+		"from": 9,
+		"to": 10,
+		"latency": 43
+	}, {
+		"from": 9,
+		"to": 0,
+		"latency": 385
+	}, {
+		"from": 10,
+		"to": 0,
+		"latency": 63
+	}, {
+		"from": 10,
+		"to": 1,
+		"latency": 24
+	}]
+}
