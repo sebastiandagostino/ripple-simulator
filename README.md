@@ -52,7 +52,7 @@ To run the simulation with a custom file placed in the same folder the project i
 
 ## About the JSON file
 
-The structure of the JSON file used for the simulation is the following:
+Here is an example JSON file showing the structure used for the simulation. More nodes and links should be provided, this is just an example.
 
 ```json
 {
@@ -68,8 +68,8 @@ The structure of the JSON file used for the simulation is the following:
 		"vote": -1,
 		"latency": 74,
 		"uniqueNodeList": [4, 0, 3, 5, 2]
-	}, 
-	...
+	} 
+
 	],
 	"links": [{
 		"from": 0,
@@ -79,8 +79,8 @@ The structure of the JSON file used for the simulation is the following:
 		"from": 1,
 		"to": 9,
 		"latency": 110
-	},
-	...
+	}
+	
 	]
 }
 ```
