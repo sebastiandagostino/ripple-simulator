@@ -12,17 +12,17 @@ private:
 
 	int timeStamp;
 
-	unsigned char state;
+	int state;
 
 public:
 
-	NodeState(int nodeId, int timeStamp, unsigned char state);
+	NodeState(int nodeId, int timeStamp, int state);
 
 	int getNodeId() const;
 
 	int getTimeStamp() const;
 
-	unsigned char getState() const;
+	int getState() const;
 
 	void updateStateIfTimeStampIsHigher(const NodeState& nodeState);
 

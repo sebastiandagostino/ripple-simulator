@@ -41,7 +41,7 @@ std::vector<int>& Node::getNodeTimeStamps() {
 	return nodeTimeStamps;
 }
 
-std::vector<signed char>& Node::getNodeStates() {
+std::vector<int>& Node::getNodeStates() {
 	return nodeStates;
 }
 
@@ -91,6 +91,25 @@ std::string Node::toJsonString() const {
 	}
 	string += "] ";
 	// End
+	string += " }";
+	return string;
+}
+
+std::string Node::toLinkString() const {
+	std::string string = "{ ";
+	int size = links.size();
+	string += "\"links\": [";
+	for (int i = 0; i < size; i++) {
+		string += " { \"nodeId\": " + patch::to_string(links[i].getToNodeId()) + ", ";
+		string += "\"totalLatency\": " + patch::to_string(links[i].getTotalLatency()) + ", ";
+		string += "\"sendTime\": " + patch::to_string(links[i].getSendTime()) + " }";
+		if (i != size - 1) {
+			string += ", ";
+		} else {
+			string += " ";
+		}
+	}
+	string += "] ";
 	string += " }";
 	return string;
 }

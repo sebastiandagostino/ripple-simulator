@@ -30,7 +30,7 @@ private:
 
     std::vector<int> nodeTimeStamps;
 
-    std::vector<signed char> nodeStates;
+    std::vector<int> nodeStates;
 
     int messagesSent;
 
@@ -56,7 +56,7 @@ public:
 
     std::vector<int>& getNodeTimeStamps();
 
-    std::vector<signed char>& getNodeStates();
+    std::vector<int>& getNodeStates();
 
     bool isOnUNL(int nodeId) const;
 
@@ -67,6 +67,8 @@ public:
 	void setVote(int vote);
 
 	std::string toJsonString() const;
+
+	std::string toLinkString() const;
 
     void receiveMessage(const Message& message, Network& network, int unlThresh);
 

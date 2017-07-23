@@ -85,6 +85,7 @@ int main(int argc, char* argv[]) {
 	json net(j.find("nodes").value());
 
 	for (auto& element : net) {
+		// NodeIds must be from 0 until numNodes - 1
 		int i = element["nodeId"];
 		int vote = element["vote"];
 		int latency = element["latency"];
@@ -92,6 +93,7 @@ int main(int argc, char* argv[]) {
 		nodes[i]->getNodeStates()[i] = vote;
 		nodes[i]->getNodeTimeStamps()[i] = 1;
 		nodes[i]->setVote(vote);
+
 		// Build our UNL
 		json uniqueNodeList(element.find("uniqueNodeList").value());
 		for (auto& unlNode : uniqueNodeList) {
@@ -129,6 +131,7 @@ int main(int argc, char* argv[]) {
 			message.insertData(i, nodes[i]->getNodeStates()[i]);
 			network.sendMessage(message, link, 0);
 		}
+
 	}
 	std::cout << "Created " << network.countMessages() << " events" << std::endl;
 
@@ -190,6 +193,11 @@ int main(int argc, char* argv[]) {
 		totalMsgsSent += nodes[i]->getMessagesSent();
 	}
 	std::cout << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
+
+	// Clean up memory
+	for (int i = 0; i < numNodes; i++) {
+		delete nodes[i];
+	}
 
 	return EXIT_SUCCESS;
 
