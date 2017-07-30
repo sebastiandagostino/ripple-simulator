@@ -29,25 +29,21 @@ make
 
 ## Running
 
-The make command produces to executable files. To do a simple JSON file generator, simply run:
+The make command produces to executable files. To do a simple, random JSON file generator, simply run:
 
 ```
-./gen
+./gen outputFile.json
 ```
 
-This will produce the `network.json` file that is provided.
+This will produce the output of the original simulator network into the `outputFile.json` file.
 
-In order to run the simulation with the default `network.json` file, simply run:
-
-```
-./sim
-```
-
-To run the simulation with a custom file placed in the same folder the project is located, type:
+In order to run the simulation for any custom file (named `inputFile.json`), just run:
 
 ```
-./sim custom.json
+./sim inputFile.json
 ```
+
+All the test files are located in the `json/` subfolder.
 
 
 ## About the JSON file
@@ -97,7 +93,7 @@ Each node transmits the messages through the network using the links and they vo
 
 ## Related project
 
-In order to generate JSON files with more flexibility, another auxiliary project [graph-builder](https://github.com/sebastiandagostino/graph-builder) was created in Java.
+In order to generate JSON files with more flexibility, another auxiliary project [graph-builder](https://github.com/sebastiandagostino/graph-builder) was created in Java. All the test files in the `json/` folder where generated with that tool (and prettyfied with [JSONLint](https://jsonlint.com/))
 
 ## Built With
 
