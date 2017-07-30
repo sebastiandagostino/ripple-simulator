@@ -36,18 +36,19 @@ using nlohmann::json;
 
 #define CONSENSUS_PERCENT       80
 
-#define DEFAULT_FILE 			"network.json"
-
 // Latencies in milliseconds
 // E2C - End to core, the latency from a node to a nearby node
 // C2C - Core to core, the additional latency when nodes are far
 
 int main(int argc, char* argv[]) {
 
-	std::string fileName = DEFAULT_FILE;
+	std::string fileName;
 
 	if (argc == 2) {
 		fileName = argv[1];
+	} else {
+		std::cerr << "usage: sim input_file" << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	// Read parameters and network from json file

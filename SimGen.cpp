@@ -5,8 +5,6 @@
 #include "src/Link.h"
 #include "src/Node.h"
 
-#define DEFAULT_FILE "network.json"
-
 #define NUM_NODES             1000
 
 #define UNL_MIN                 20
@@ -25,19 +23,23 @@
 int main(int argc, char* argv[]) {
 
 	std::ofstream file;
-	std::string fileName = DEFAULT_FILE;
+	std::string fileName;
 
 	int numNodes = NUM_NODES;
 	int numOutboundLinks = NUM_OUTBOUND_LINKS;
 
 	if (argc == 2) {
 		fileName = argv[1];
+	} else {
+		std::cerr << "usage: gen output_file" << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	file.open(fileName.c_str());
 
 	if (!file.is_open()) {
-		return -1;
+		std::cerr << "Unable to create file. Exiting..." << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	std::cout << "Running with NUM_NODES = " << numNodes << std::endl;
