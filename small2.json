@@ -59,7 +59,7 @@
 	}, {
 		"nodeId": 11,
 		"vote": -1,
-		"latency": 282,
+		"latency": 461,
 		"uniqueNodeList": [6, 5, 2, 1, 10, 9, 0]
 	}],
 	"links": [{
