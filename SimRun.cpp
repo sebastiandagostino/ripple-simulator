@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
 
 	Network network;
 
-	std::cerr << "Creating initial messages" << std::endl;
+	std::cout << "Creating initial messages" << std::endl;
 	for (int i = 0; i < numNodes; i++) {
 		for (Link& link : nodes[i]->getLinks()) {
 			Message message(i, link.getToNodeId());
