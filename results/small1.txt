@@ -1,0 +1,22 @@
+Loading network from file: json/small1.json
+Reading NUM_NODES = 50
+Reading UNL_THRESH = 8
+Creating nodes
+Creating links
+Creating initial messages
+Created 668 events
+Time: 150 ms  25/25
+Time: 200 ms  25/25
+Time: 302 ms  25/25
+Time: 400 ms  24/26
+Time: 501 ms  21/29
+Time: 600 ms  20/30
+Time: 700 ms  16/34
+Time: 800 ms  12/38
+Time: 900 ms  10/40
+Time: 1000 ms  10/40
+Time: 1100 ms  10/40
+Time: 1200 ms  10/40
+Time: 1300 ms  10/40
+Consensus reached in 1367 ms with 7094 messages on the wire
+The average node sent 179 messages

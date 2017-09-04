@@ -1,0 +1,29 @@
+Loading network from file: json/tiny1.json
+Reading NUM_NODES = 11
+Reading UNL_THRESH = 3
+Creating nodes
+Creating links
+Creating initial messages
+Created 22 events
+Time: 347 ms  6/5
+Time: 423 ms  6/5
+Time: 505 ms  6/5
+Time: 601 ms  6/5
+Time: 740 ms  6/5
+Time: 862 ms  6/5
+Time: 900 ms  6/5
+Time: 1004 ms  6/5
+Time: 1119 ms  6/5
+Time: 1225 ms  6/5
+Time: 1305 ms  6/5
+Time: 1410 ms  6/5
+Time: 1511 ms  5/6
+Time: 1635 ms  5/6
+Time: 1718 ms  5/6
+Time: 1801 ms  4/7
+Time: 1903 ms  4/7
+Time: 2005 ms  4/7
+Time: 2100 ms  3/8
+Time: 2205 ms  3/8
+Consensus reached in 2264 ms with 82 messages on the wire
+The average node sent 15 messages

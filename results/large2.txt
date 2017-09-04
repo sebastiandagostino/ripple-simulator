@@ -1,0 +1,17 @@
+Loading network from file: json/large2.json
+Reading NUM_NODES = 1080
+Reading UNL_THRESH = 33
+Creating nodes
+Creating links
+Creating initial messages
+Created 1425 events
+Time: 100 ms  540/540
+Time: 200 ms  540/540
+Time: 300 ms  535/545
+Time: 400 ms  504/576
+Time: 500 ms  469/611
+Time: 600 ms  352/728
+Time: 700 ms  303/777
+Time: 800 ms  230/850
+Consensus reached in 820 ms with 996792 messages on the wire
+The average node sent 817 messages
