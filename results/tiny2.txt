@@ -5,23 +5,26 @@ Creating nodes
 Creating links
 Creating initial messages
 Created 29 events
-Time: 347 ms  6/6
-Time: 423 ms  6/6
-Time: 505 ms  6/6
-Time: 601 ms  6/6
-Time: 740 ms  6/6
-Time: 862 ms  6/6
-Time: 900 ms  6/6
-Time: 1004 ms  6/6
-Time: 1106 ms  6/6
-Time: 1201 ms  6/6
-Time: 1300 ms  6/6
-Time: 1409 ms  6/6
-Time: 1511 ms  4/8
-Time: 1634 ms  4/8
-Time: 1718 ms  4/8
-Time: 1801 ms  4/8
-Time: 1903 ms  4/8
-Time: 2005 ms  4/8
+      Time (ms)	    Positive	    Negative
+      ---------	    --------	    --------
+	347;		6;		6
+	423;		6;		6
+	505;		6;		6
+	601;		6;		6
+	740;		6;		6
+	862;		6;		6
+	900;		6;		6
+	1004;		6;		6
+	1106;		6;		6
+	1201;		6;		6
+	1300;		6;		6
+	1409;		6;		6
+	1511;		4;		8
+	1634;		4;		8
+	1718;		4;		8
+	1801;		4;		8
+	1903;		4;		8
+	2005;		4;		8
+	2026;		2;		10
 Consensus reached in 2026 ms with 114 messages on the wire
 The average node sent 16 messages

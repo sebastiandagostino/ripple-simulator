@@ -137,11 +137,12 @@ int main(int argc, char* argv[]) {
 	std::cout << "Created " << network.countMessages() << " events" << std::endl;
 
 	// Run simulation
-
+	std::cout << "      Time (ms)\t    Positive\t    Negative" << std::endl
+			<< "      ---------\t    --------\t    --------" << std::endl;
 	do {
-		// Count nodes and check convergence
 		int nodesPositive = 0;
 		int nodesNegative = 0;
+		// Count nodes and check convergence
 		for (int i = 0; i < numNodes; i++) {
 			if (nodes[i]->getVote() > 0) {
 				nodesPositive++;
@@ -163,8 +164,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		if ((event->first / 100) > (network.getMasterTime() / 100)) {
-			std::cout << "Time: " << event->first << " ms  " << nodesPositive
-					<< "/" << nodesNegative << std::endl;
+			std::cout << "\t" << event->first << ";\t\t" << nodesPositive << ";\t\t"
+					<< nodesNegative << std::endl;
 		}
 		network.setMasterTime(event->first);
 
@@ -185,6 +186,18 @@ int main(int argc, char* argv[]) {
 	for (it = network.getMessages().begin(); it != network.getMessages().end(); it++) {
 		mc += it->second.getMessages().size();
 	}
+	int nodesPositive = 0;
+	int nodesNegative = 0;
+	// Count nodes and check convergence
+	for (int i = 0; i < numNodes; i++) {
+		if (nodes[i]->getVote() > 0) {
+			nodesPositive++;
+		} else if (nodes[i]->getVote() < 0) {
+			nodesNegative++;
+		}
+	}
+	std::cout << "\t" << network.getMasterTime() << ";\t\t" << nodesPositive << ";\t\t"
+			<< nodesNegative << std::endl;
 	std::cout << "Consensus reached in " << network.getMasterTime()
 			<< " ms with " << mc << " messages on the wire" << std::endl;
 
