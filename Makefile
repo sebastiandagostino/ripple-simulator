@@ -13,18 +13,18 @@ default: clean gen sim
 all: default
 
 %.o: %.cpp $(HEADERS)
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+    $(CXX) -c $(CXXFLAGS) -o $@ $<
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
 sim: $(OBJECTS) SimRun.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+    $(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 gen: $(OBJECTS) SimGen.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^
+    $(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	-rm -f *.o
-	-rm -f src/*.o
-	-rm -f sim
-	-rm -f gen
+    -rm -f *.o
+    -rm -f src/*.o
+    -rm -f sim
+    -rm -f gen
