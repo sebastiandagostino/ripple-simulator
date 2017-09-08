@@ -12,13 +12,13 @@ class Event {
 
 private:
 
-	std::list<Message> messages;
+    std::list<Message> messages;
 
 public:
 
-	Message* addMessage(const Message& m);
+    Message* addMessage(const Message& m);
 
-	const std::list<Message>& getMessages() const;
+    const std::list<Message>& getMessages() const;
 
 };
 
