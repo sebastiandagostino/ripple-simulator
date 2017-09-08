@@ -44,13 +44,13 @@ public:
 
     int getNodeId() const;
 
-	int getLatency() const;
+    int getLatency() const;
 
-	int getMessagesSent() const;
+    int getMessagesSent() const;
 
-	void decreaseMessagesSent();
+    void decreaseMessagesSent();
 
-	std::vector<int>& getUniqueNodeList();
+    std::vector<int>& getUniqueNodeList();
 
     std::vector<Link>& getLinks();
 
@@ -62,13 +62,13 @@ public:
 
     bool hasLinkTo(int nodeId) const;
 
-	int getVote() const;
+    int getVote() const;
 
-	void setVote(int vote);
+    void setVote(int vote);
 
-	std::string toJsonString() const;
+    std::string toJsonString() const;
 
-	std::string toLinkString() const;
+    std::string toLinkString() const;
 
     void receiveMessage(const Message& message, Network& network, int unlThresh);
 
