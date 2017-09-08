@@ -30,16 +30,15 @@ void Message::insertData(int nodeId, signed char status) {
 
 void Message::addPositions(const std::map<int, NodeState>& update) {
 	// add this information to our message
-	std::map<int, NodeState>::const_iterator updateIt;
-	for (updateIt = update.begin(); updateIt != update.end(); updateIt++) {
-		if (updateIt->first != this->toNodeId) {
+	for (auto const& updatePos : update) {
+		if (updatePos.first != this->toNodeId) {
 			// don't tell a node about itself
-			std::map<int, NodeState>::iterator msgIt = data.find(updateIt->first);
+			std::map<int, NodeState>::iterator msgIt = data.find(updatePos.first);
 			if (msgIt != data.end() && msgIt->first) {
 				// we already had data about this node going in this message
-				msgIt->second.updateStateIfTimeStampIsHigher(updateIt->second);
+				msgIt->second.updateStateIfTimeStampIsHigher(updatePos.second);
 			} else {
-				data.insert(std::make_pair(updateIt->first, updateIt->second));
+				data.insert(std::make_pair(updatePos.first, updatePos.second));
 			}
 		}
 	}
