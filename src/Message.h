@@ -24,15 +24,15 @@ public:
 
     Message(int fromNodeId, int toNodeId, const std::map<int, NodeState>& data);
 
-	int getFromNodeId() const;
+    int getFromNodeId() const;
 
-	int getToNodeId() const;
+    int getToNodeId() const;
 
-	bool hasEmptyData() const;
+    bool hasEmptyData() const;
 
-	void insertData(int nodeId, signed char status);
+    void insertData(int nodeId, signed char status);
 
-	const std::map<int, NodeState>& getData() const;
+    const std::map<int, NodeState>& getData() const;
 
     void addPositions(const std::map<int, NodeState>& data);
 
