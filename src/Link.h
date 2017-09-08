@@ -22,19 +22,19 @@ public:
 
     Link(int toNodeId, int totalLatency);
 
-	int getToNodeId() const;
+    int getToNodeId() const;
 
-	int getReceiveTime() const;
+    int getReceiveTime() const;
 
-	int getSendTime() const;
+    int getSendTime() const;
 
-	void setSendTime(int sendTime);
+    void setSendTime(int sendTime);
 
-	int getTotalLatency() const;
+    int getTotalLatency() const;
 
-	Message* getMessages();
+    Message* getMessages();
 
-	void setMessages(Message* messages);
+    void setMessages(Message* messages);
 
 };
 
