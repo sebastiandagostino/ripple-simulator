@@ -8,23 +8,23 @@ class NodeState {
 
 private:
 
-	int nodeId;
+    int nodeId;
 
-	int timeStamp;
+    int timeStamp;
 
-	int state;
+    int state;
 
 public:
 
-	NodeState(int nodeId, int timeStamp, int state);
+    NodeState(int nodeId, int timeStamp, int state);
 
-	int getNodeId() const;
+    int getNodeId() const;
 
-	int getTimeStamp() const;
+    int getTimeStamp() const;
 
-	int getState() const;
+    int getState() const;
 
-	void updateStateIfTimeStampIsHigher(const NodeState& nodeState);
+    void updateStateIfTimeStampIsHigher(const NodeState& nodeState);
 
 };
 
