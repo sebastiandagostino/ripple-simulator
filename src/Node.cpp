@@ -127,9 +127,11 @@ void Node::receiveMessage(const Message& message, Network& network, int unlThres
     }
 
     // 1) Update our knowledge
-    std::unordered_map<int, NodeState> changes;
+    google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint> changes;
+    changes.clear_deleted_key();
+    changes.set_deleted_key(-1);
 
-    std::unordered_map<int, NodeState>::const_iterator chgIt;
+    google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>::const_iterator chgIt;
     for (chgIt = message.getData().begin(); chgIt != message.getData().end(); chgIt++) {
         if ((chgIt->first != nodeId)
                 && (nodeStates[chgIt->first] != chgIt->second.getState())
@@ -137,7 +139,7 @@ void Node::receiveMessage(const Message& message, Network& network, int unlThres
             // This gives us new information about a node
             nodeStates[chgIt->first] = chgIt->second.getState();
             nodeTimeStamps[chgIt->first] = chgIt->second.getTimeStamp();
-            changes.insert(std::make_pair(chgIt->first, chgIt->second));
+            changes[chgIt->first] = chgIt->second;
         }
     }
 
@@ -173,13 +175,13 @@ void Node::receiveMessage(const Message& message, Network& network, int unlThres
             // we switch to -
             nodeStates[nodeId] = -1;
             vote = -1;
-            changes.insert(std::make_pair(nodeId, NodeState(nodeId, ++nodeTimeStamps[nodeId], -1)));
+            changes[nodeId] = NodeState(nodeId, ++nodeTimeStamps[nodeId], -1);
             positionChange = true;
         } else if ((nodeStates[nodeId] == -1) && (unlBalance > SELF_WEIGHT)) {
             // we switch to +
             nodeStates[nodeId] = 1;
             vote = 1;
-            changes.insert(std::make_pair(nodeId, NodeState(nodeId, ++nodeTimeStamps[nodeId], +1)));
+            changes[nodeId] = NodeState(nodeId, ++nodeTimeStamps[nodeId], +1);
             positionChange = true;
         }
     }

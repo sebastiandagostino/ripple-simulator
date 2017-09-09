@@ -16,6 +16,8 @@ private:
 
 public:
 
+    NodeState();
+
     NodeState(int nodeId, int timeStamp, int state);
 
     int getNodeId() const;

@@ -1,5 +1,9 @@
 #include "NodeState.h"
 
+NodeState::NodeState() :
+    nodeId(), timeStamp(), state() {
+}
+
 NodeState::NodeState(int nodeId, int timeStamp, int state) :
     nodeId(nodeId), timeStamp(timeStamp), state(state) {
 }

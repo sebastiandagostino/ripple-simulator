@@ -1,9 +1,15 @@
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
 
-#include <unordered_map>
+#include <sparsehash/sparse_hash_map>
 
 #include "NodeState.h"
+
+struct eqint {
+    bool operator()(int i1, int i2) const {
+        return i1 == i2;
+    }
+};
 
 /**
  * A message sent from one node to another, containing the positions taken
@@ -16,13 +22,13 @@ private:
 
     int toNodeId;
 
-    std::unordered_map<int, NodeState> data;
+    google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint> data;
 
 public:
 
     Message(int fromNodeId, int toNodeId);
 
-    Message(int fromNodeId, int toNodeId, const std::unordered_map<int, NodeState>& data);
+    Message(int fromNodeId, int toNodeId, google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data);
 
     int getFromNodeId() const;
 
@@ -32,11 +38,11 @@ public:
 
     void insertData(int nodeId, signed char status);
 
-    const std::unordered_map<int, NodeState>& getData() const;
+    const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& getData() const;
 
-    void addPositions(const std::unordered_map<int, NodeState>& data);
+    void addPositions(const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data);
 
-    void subPositions(const std::unordered_map<int, NodeState>& data);
+    void subPositions(const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data);
 
 };
 

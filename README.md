@@ -21,7 +21,14 @@ Due to the original project structure and the use of a JSON parsing library, the
 
 ## Compiling
 
-This is a plain Makefile project so in order to build everything just run
+Before compiling, it is required to have the [sparsehash](https://github.com/sparsehash/sparsehash) library. 
+It is required to clone or download the project and install it. If using Ubuntu, for simplicity run this instead:
+
+```
+sudo apt-get install libsparsehash-dev
+```
+
+After installing this library, in order to build this plain Makefile project just run:
 
 ```
 make
@@ -98,6 +105,8 @@ In order to generate JSON files with more flexibility, another auxiliary project
 ## Built With
 
 * [nlohmann:json](https://github.com/nlohmann/json) - Used to parse JSON streams
+
+* [sparsehash](https://github.com/sparsehash/sparsehash) - Used for efficent hashmaps usage
 
 ## Author
 
