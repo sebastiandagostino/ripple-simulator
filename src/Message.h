@@ -1,7 +1,7 @@
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
 
-#include <map>
+#include <unordered_map>
 
 #include "NodeState.h"
 
@@ -16,13 +16,13 @@ private:
 
     int toNodeId;
 
-    std::map<int, NodeState> data;
+    std::unordered_map<int, NodeState> data;
 
 public:
 
     Message(int fromNodeId, int toNodeId);
 
-    Message(int fromNodeId, int toNodeId, const std::map<int, NodeState>& data);
+    Message(int fromNodeId, int toNodeId, const std::unordered_map<int, NodeState>& data);
 
     int getFromNodeId() const;
 
@@ -32,11 +32,11 @@ public:
 
     void insertData(int nodeId, signed char status);
 
-    const std::map<int, NodeState>& getData() const;
+    const std::unordered_map<int, NodeState>& getData() const;
 
-    void addPositions(const std::map<int, NodeState>& data);
+    void addPositions(const std::unordered_map<int, NodeState>& data);
 
-    void subPositions(const std::map<int, NodeState>& data);
+    void subPositions(const std::unordered_map<int, NodeState>& data);
 
 };
 

@@ -127,9 +127,9 @@ void Node::receiveMessage(const Message& message, Network& network, int unlThres
     }
 
     // 1) Update our knowledge
-    std::map<int, NodeState> changes;
+    std::unordered_map<int, NodeState> changes;
 
-    std::map<int, NodeState>::const_iterator chgIt;
+    std::unordered_map<int, NodeState>::const_iterator chgIt;
     for (chgIt = message.getData().begin(); chgIt != message.getData().end(); chgIt++) {
         if ((chgIt->first != nodeId)
                 && (nodeStates[chgIt->first] != chgIt->second.getState())
