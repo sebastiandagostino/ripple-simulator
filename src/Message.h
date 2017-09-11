@@ -11,6 +11,8 @@ struct eqint {
     }
 };
 
+typedef google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint> Map;
+
 /**
  * A message sent from one node to another, containing the positions taken
  */
@@ -22,13 +24,13 @@ private:
 
     int toNodeId;
 
-    google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint> data;
+    Map data;
 
 public:
 
     Message(int fromNodeId, int toNodeId);
 
-    Message(int fromNodeId, int toNodeId, google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data);
+    Message(int fromNodeId, int toNodeId, Map& data);
 
     int getFromNodeId() const;
 
@@ -38,11 +40,11 @@ public:
 
     void insertData(int nodeId, signed char status);
 
-    const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& getData() const;
+    const Map& getData() const;
 
-    void addPositions(const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data);
+    void addPositions(const Map& data);
 
-    void subPositions(const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data);
+    void subPositions(const Map& data);
 
 };
 

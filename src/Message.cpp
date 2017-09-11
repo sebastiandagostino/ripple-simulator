@@ -6,7 +6,7 @@ Message::Message(int fromNodeId, int toNodeId) :
 	data.set_deleted_key(-1);
 }
 
-Message::Message(int fromNodeId, int toNodeId, google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& data) :
+Message::Message(int fromNodeId, int toNodeId, Map& data) :
     fromNodeId(fromNodeId), toNodeId(toNodeId), data(data) {
 	data.clear_deleted_key();
 	data.set_deleted_key(-1);
@@ -24,7 +24,7 @@ bool Message::hasEmptyData() const {
     return data.empty();
 }
 
-const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& Message::getData() const {
+const Map& Message::getData() const {
     return data;
 }
 
@@ -32,12 +32,12 @@ void Message::insertData(int nodeId, signed char status) {
     data[nodeId] = NodeState(nodeId, 1, status);
 }
 
-void Message::addPositions(const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& update) {
+void Message::addPositions(const Map& update) {
     // add this information to our message
     for (auto const& updateState : update) {
         if (updateState.first != this->toNodeId) {
             // don't tell a node about itself
-            google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>::iterator msgIt = data.find(updateState.first);
+            Map::iterator msgIt = data.find(updateState.first);
             if (msgIt != data.end() && msgIt->first) {
                 // we already had data about this node going in this message
                 msgIt->second.updateStateIfTimeStampIsHigher(updateState.second);
@@ -48,11 +48,11 @@ void Message::addPositions(const google::sparse_hash_map<int, NodeState, std::tr
     }
 }
 
-void Message::subPositions(const google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>& received) {
+void Message::subPositions(const Map& received) {
     // we received this information from this node, so no need to send it
     for (auto const& receivedState : received) {
         if (receivedState.first != this->toNodeId) {
-            google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>::iterator msgIt = data.find(receivedState.first);
+            Map::iterator msgIt = data.find(receivedState.first);
             if ((msgIt != this->data.end()) && (receivedState.second.getTimeStamp() >= msgIt->second.getTimeStamp())) {
                 data.erase(msgIt->first); // The node doesn't need the data
             }

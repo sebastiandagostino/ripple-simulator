@@ -127,11 +127,11 @@ void Node::receiveMessage(const Message& message, Network& network, int unlThres
     }
 
     // 1) Update our knowledge
-    google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint> changes;
+    Map changes;
     changes.clear_deleted_key();
     changes.set_deleted_key(-1);
 
-    google::sparse_hash_map<int, NodeState, std::tr1::hash<int>, eqint>::const_iterator chgIt;
+    Map::const_iterator chgIt;
     for (chgIt = message.getData().begin(); chgIt != message.getData().end(); chgIt++) {
         if ((chgIt->first != nodeId)
                 && (nodeStates[chgIt->first] != chgIt->second.getState())
