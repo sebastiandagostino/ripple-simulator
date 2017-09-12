@@ -1,5 +1,5 @@
 DEFS       = 
-LIBS       = $(wildcard lib/*.hpp)
+LIBS       = -ljsoncpp
 DEBUGFLAGS = -DDEBUG -g
 CXXFLAGS   = -O3 -std=c++11 -Wall -Wno-sign-compare -Wno-char-subscripts \
              -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS)

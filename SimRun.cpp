@@ -21,6 +21,7 @@
 #include <sstream>
 #include <cstring>
 #include <random>
+#include <jsoncpp/json/json.h>
 
 #include "src/Event.h"
 #include "src/Link.h"
@@ -28,11 +29,6 @@
 #include "src/Network.h"
 #include "src/Node.h"
 #include "src/NodeState.h"
-
-// JSON for modern C++
-// https://github.com/nlohmann/json
-#include "lib/json.hpp"
-using nlohmann::json;
 
 #define CONSENSUS_PERCENT       80
 
@@ -52,79 +48,70 @@ int main(int argc, char* argv[]) {
     }
 
     // Read parameters and network from json file
-
     std::cout << "Loading network from file: " << fileName << std::endl;
 
     std::ifstream file(fileName.c_str());
-    json j;
-    file >> j;
-
-    if (j.find("numNodes") == j.end()) {
-        std::cerr << "Value NUM_NODES not found. Exiting..." << std::endl;
+    Json::Reader reader;
+    Json::Value json;
+    if (!reader.parse(file, json)) {
+        std::cerr << "Error: " << reader.getFormattedErrorMessages() << std::endl;
         return EXIT_FAILURE;
     }
-    int numNodes = j.find("numNodes").value().get<int>();
+
+    int countParams = 0;
+    for (auto const& id : json.getMemberNames()) {
+    	if (id == "numNodes" || id == "unlThresh" || id == "nodes" || id == "links") {
+    		countParams++;
+    	}
+    }
+    if (countParams != 4) {
+        std::cerr << "Json data: 'numNodes', 'unlThresh', 'nodes' or 'links' not found. Exiting..." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    int numNodes = json["numNodes"].asInt();
     std::cout << "Reading NUM_NODES = " << numNodes << std::endl;
-
-    if (j.find("unlThresh") == j.end()) {
-        std::cerr << "Value UNL_THRESH not found. Exiting..." << std::endl;
-        return EXIT_FAILURE;
-    }
-    int unlThresh = j.find("unlThresh").value().get<int>();
+    int unlThresh = json["unlThresh"].asInt();
     std::cout << "Reading UNL_THRESH = " << unlThresh << std::endl;
 
     // Create nodes
-
-    if (j.find("nodes") == j.end()) {
-        std::cerr << "Nodes not found. Exiting..." << std::endl;
-        return EXIT_FAILURE;
-    }
     std::cout << "Creating nodes" << std::endl;
-
     Node* nodes[numNodes];
 
-    json net(j.find("nodes").value());
-
-    for (auto& element : net) {
+    const Json::Value& networkNodes = json["nodes"];
+    for (const auto& element : networkNodes) {
         // NodeIds must be from 0 until numNodes - 1
-        int i = element["nodeId"];
-        int vote = element["vote"];
-        int latency = element["latency"];
-        nodes[i] = new Node(i, numNodes, latency);
-        nodes[i]->getNodeStates()[i] = vote;
-        nodes[i]->getNodeTimeStamps()[i] = 1;
-        nodes[i]->setVote(vote);
+        int nodeId = element["nodeId"].asInt();
+        int vote = element["vote"].asInt();
+        int latency = element["latency"].asInt();
+        nodes[nodeId] = new Node(nodeId, numNodes, latency);
+        nodes[nodeId]->getNodeStates()[nodeId] = vote;
+        nodes[nodeId]->getNodeTimeStamps()[nodeId] = 1;
+        nodes[nodeId]->setVote(vote);
 
         // Build our UNL
-        json uniqueNodeList(element.find("uniqueNodeList").value());
-        for (auto& unlNode : uniqueNodeList) {
-            nodes[i]->getUniqueNodeList().push_back(unlNode);
+        const Json::Value& uniqueNodeList = element["uniqueNodeList"];
+        for (const auto& unlNode : uniqueNodeList) {
+            nodes[nodeId]->getUniqueNodeList().push_back(unlNode.asInt());
         }
     }
 
     // Create links
-
-    if (j.find("links") == j.end()) {
-        std::cerr << "Links not found. Exiting..." << std::endl;
-        return EXIT_FAILURE;
-    }
     std::cout << "Creating links" << std::endl;
 
-    json links(j.find("links").value());
-
-    for (auto& link : links) {
-        int i = link["from"];
-        int lt = link["to"];
-        int latency = link["latency"];
+    const Json::Value& networkLinks = json["links"];
+    for (const auto& link : networkLinks) {
+        int i = link["from"].asInt();
+        int lt = link["to"].asInt();
+        int latency = link["latency"].asInt();
         int ll = nodes[i]->getLatency() + nodes[lt]->getLatency() + latency;
         nodes[i]->getLinks().push_back(Link(lt, ll));
         nodes[lt]->getLinks().push_back(Link(i, ll));
     }
 
-    // Trigger all nodes to make initial broadcasts of their own positions
-
     Network network;
 
+    // Trigger all nodes to make initial broadcasts of their own positions
     std::cout << "Creating initial messages" << std::endl;
     for (int i = 0; i < numNodes; i++) {
         for (Link& link : nodes[i]->getLinks()) {

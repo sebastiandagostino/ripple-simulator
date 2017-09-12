@@ -10,25 +10,21 @@ Besides that, the main motivation for this fork is to separate the network creat
 
 By allowing to run a parametrized network, this project will be useful to analyse how different network topologies impact the consensus process.
 
-## Supported compilers
-
-Due to the original project structure and the use of a JSON parsing library, the C++11 compilers supported are the following:
-
-- GCC 4.9 - 7.1 (and possibly later)
-- Clang 3.4 - 3.9 (and possibly later)
-- Microsoft Visual C++ 2015 / Build Tools 14.0.25123.0 (and possibly later)
-- Microsoft Visual C++ 2017 / Build Tools 15.1.548.43366 (and possibly later)
-
 ## Compiling
 
-Before compiling, it is required to have the [sparsehash](https://github.com/sparsehash/sparsehash) library. 
+Before compiling, it is required to have the following libraries installed in the system:
+
+* [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
+
+* [sparsehash](https://github.com/sparsehash/sparsehash) 
+
 It is required to clone or download the project and install it. If using Ubuntu, for simplicity run this instead:
 
 ```
-sudo apt-get install libsparsehash-dev
+sudo apt-get install libjsoncpp-dev libsparsehash-dev
 ```
 
-After installing this library, in order to build this plain Makefile project just run:
+After having the libraries installed in the system just run:
 
 ```
 make
@@ -104,7 +100,7 @@ In order to generate JSON files with more flexibility, another auxiliary project
 
 ## Built With
 
-* [nlohmann:json](https://github.com/nlohmann/json) - Used to parse JSON streams
+* [jsoncpp](https://github.com/open-source-parsers/jsoncpp) - Used to parse JSON streams
 
 * [sparsehash](https://github.com/sparsehash/sparsehash) - Used for efficent hashmaps usage
 
