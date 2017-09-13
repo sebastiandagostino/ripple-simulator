@@ -7,13 +7,15 @@
 #include "Link.h"
 #include "Message.h"
 
+typedef std::map<int, Event> EventMap;
+
 class Network {
 
 private:
 
     int masterTime;
 
-    std::map<int, Event> messages;
+    EventMap messages;
 
 public:
 
@@ -27,7 +29,9 @@ public:
 
     int countMessages() const;
 
-    std::map<int, Event>& getMessages();
+    int countMessagesOnTheWire() const;
+
+    EventMap& getMessages();
 
 };
 

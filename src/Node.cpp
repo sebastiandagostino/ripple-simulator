@@ -127,11 +127,11 @@ void Node::receiveMessage(const Message& message, Network& network, int unlThres
     }
 
     // 1) Update our knowledge
-    Map changes;
+    NodeStateMap changes;
     changes.clear_deleted_key();
     changes.set_deleted_key(-1);
 
-    Map::const_iterator chgIt;
+    NodeStateMap::const_iterator chgIt;
     for (chgIt = message.getData().begin(); chgIt != message.getData().end(); chgIt++) {
         if ((chgIt->first != nodeId)
                 && (nodeStates[chgIt->first] != chgIt->second.getState())

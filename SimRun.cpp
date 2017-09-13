@@ -144,12 +144,12 @@ int main(int argc, char* argv[]) {
             break;
         }
 
-        std::map<int, Event>::iterator event = network.getMessages().begin();
-        if (event == network.getMessages().end()) {
+        if (network.getMessages().empty()) {
             std::cerr << "Fatal: Radio Silence. Exiting..." << std::endl;
             return EXIT_FAILURE;
         }
 
+        EventMap::iterator event = network.getMessages().begin();
         if ((event->first / 100) > (network.getMasterTime() / 100)) {
             std::cout << "\t" << event->first << ";\t\t" << nodesPositive << ";\t\t"
                     << nodesNegative << std::endl;
@@ -168,11 +168,6 @@ int main(int argc, char* argv[]) {
         network.getMessages().erase(event);
     } while (1);
 
-    int mc = 0;
-    std::map<int, Event>::iterator it;
-    for (it = network.getMessages().begin(); it != network.getMessages().end(); it++) {
-        mc += it->second.getMessages().size();
-    }
     int nodesPositive = 0;
     int nodesNegative = 0;
     // Count nodes and check convergence
@@ -183,10 +178,9 @@ int main(int argc, char* argv[]) {
             nodesNegative++;
         }
     }
-    std::cout << "\t" << network.getMasterTime() << ";\t\t" << nodesPositive << ";\t\t"
-            << nodesNegative << std::endl;
-    std::cout << "Consensus reached in " << network.getMasterTime()
-            << " ms with " << mc << " messages on the wire" << std::endl;
+    std::cout << "\t" << network.getMasterTime() << ";\t\t" << nodesPositive << ";\t\t" << nodesNegative << std::endl;
+    std::cout << "Consensus reached in " << network.getMasterTime() << " ms with "
+    		<< network.countMessagesOnTheWire() << " messages on the wire" << std::endl;
 
     // Output result
     long totalMsgsSent = 0;
@@ -194,11 +188,6 @@ int main(int argc, char* argv[]) {
         totalMsgsSent += nodes[i]->getMessagesSent();
     }
     std::cout << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
-
-    // Clean up memory
-    for (int i = 0; i < numNodes; i++) {
-        delete nodes[i];
-    }
 
     return EXIT_SUCCESS;
 

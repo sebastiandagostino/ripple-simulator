@@ -3,7 +3,9 @@
 #include "Network.h"
 
 Network::Network() :
-    masterTime(0) {
+    masterTime(0), messages() {
+	//messages.clear_deleted_key();
+	//messages.set_deleted_key(-1);
 }
 
 int Network::getMasterTime() const {
@@ -24,6 +26,15 @@ int Network::countMessages() const {
     return messages.size();
 }
 
-std::map<int, Event>& Network::getMessages() {
+int Network::countMessagesOnTheWire() const {
+    int mc = 0;
+    EventMap::iterator it;
+    for (const auto& event : messages) {
+        mc += event.second.getMessages().size();
+    }
+    return mc;
+}
+
+EventMap& Network::getMessages() {
     return messages;
 }
