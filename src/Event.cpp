@@ -4,8 +4,8 @@ Event::Event() :
 	messages() {
 }
 
-Message* Event::addMessage(const Message& m) {
-    messages.push_back(m);
+Message* Event::addMessage(const Message& message) {
+    messages.push_back(message);
     return &*messages.rbegin();
 }
 

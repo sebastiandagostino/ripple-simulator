@@ -18,7 +18,7 @@ public:
 
     Event();
 
-    Message* addMessage(const Message& m);
+    Message* addMessage(const Message& message);
 
     const std::list<Message>& getMessages() const;
 
