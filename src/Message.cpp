@@ -1,5 +1,11 @@
 #include "Message.h"
 
+Message::Message(const Message& message) :
+	fromNodeId(message.fromNodeId), toNodeId(message.toNodeId), data(message.data) {
+	data.clear_deleted_key();
+	data.set_deleted_key(-1);
+}
+
 Message::Message(int fromNodeId, int toNodeId) :
     fromNodeId(fromNodeId), toNodeId(toNodeId), data() {
 	data.clear_deleted_key();

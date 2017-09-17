@@ -28,6 +28,8 @@ private:
 
 public:
 
+    Message(const Message& message);
+
     Message(int fromNodeId, int toNodeId);
 
     Message(int fromNodeId, int toNodeId, NodeStateMap& data);
