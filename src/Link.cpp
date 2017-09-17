@@ -1,7 +1,7 @@
 #include "Link.h"
 
 Link::Link(int toNodeId, int totalLatency) :
-    toNodeId(toNodeId), totalLatency(totalLatency), sendTime(0), messages(0) {
+    toNodeId(toNodeId), totalLatency(totalLatency), sendTime(0), messages() {
 }
 
 int Link::getToNodeId() const {
