@@ -113,10 +113,10 @@ int main(int argc, char* argv[]) {
 
     // Trigger all nodes to make initial broadcasts of their own positions
     std::cout << "Creating initial messages" << std::endl;
-    for (int i = 0; i < numNodes; i++) {
-        for (Link& link : nodes[i]->getLinks()) {
-            Message message(i, link.getToNodeId());
-            message.insertData(i, nodes[i]->getNodeStates()[i]);
+    for (const auto& node : nodes) {
+        for (auto& link : node->getLinks()) {
+            Message message(node->getNodeId(), link.getToNodeId());
+            message.insertData(node->getNodeId(), node->getNodeStates()[node->getNodeId()]);
             network.sendMessage(message, link, 0);
         }
 
@@ -130,10 +130,10 @@ int main(int argc, char* argv[]) {
         int nodesPositive = 0;
         int nodesNegative = 0;
         // Count nodes and check convergence
-        for (int i = 0; i < numNodes; i++) {
-            if (nodes[i]->getVote() > 0) {
+        for (const auto& node : nodes) {
+            if (node->getVote() > 0) {
                 nodesPositive++;
-            } else if (nodes[i]->getVote() < 0) {
+            } else if (node->getVote() < 0) {
                 nodesNegative++;
             }
         }
@@ -166,15 +166,15 @@ int main(int argc, char* argv[]) {
         }
 
         network.getMessages().erase(event);
-    } while (1);
+    } while (true);
 
     int nodesPositive = 0;
     int nodesNegative = 0;
     // Count nodes and check convergence
-    for (int i = 0; i < numNodes; i++) {
-        if (nodes[i]->getVote() > 0) {
+    for (const auto& node : nodes) {
+        if (node->getVote() > 0) {
             nodesPositive++;
-        } else if (nodes[i]->getVote() < 0) {
+        } else if (node->getVote() < 0) {
             nodesNegative++;
         }
     }
@@ -184,8 +184,8 @@ int main(int argc, char* argv[]) {
 
     // Output result
     long totalMsgsSent = 0;
-    for (int i = 0; i < numNodes; i++) {
-        totalMsgsSent += nodes[i]->getMessagesSent();
+    for (const auto& node : nodes) {
+        totalMsgsSent += node->getMessagesSent();
     }
     std::cout << "The average node sent " << totalMsgsSent / numNodes << " messages" << std::endl;
 
