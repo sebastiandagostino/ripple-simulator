@@ -28,7 +28,6 @@ int Network::countMessages() const {
 
 int Network::countMessagesOnTheWire() const {
     int mc = 0;
-    EventMap::iterator it;
     for (const auto& event : messages) {
         mc += event.second.getMessages().size();
     }
