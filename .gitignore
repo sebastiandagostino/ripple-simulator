@@ -14,5 +14,9 @@ gen
 .project
 .settings/
 
+# Ignore KDevelop project files
+*.kdev4
+.kdev4/
+
 #Ignore Callgrind output files
 callgrind.out.*
