@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
         }
 
     }
-    std::cout << "Created " << network.countMessages() << " events" << std::endl;
+    std::cout << "Created " << network.countMessagesOnTheWire() << " events" << std::endl;
 
     // Run simulation
     std::cout << "      Time (ms)\t    Positive\t    Negative" << std::endl
